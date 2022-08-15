@@ -1,0 +1,1 @@
+SeparateDefinitionBlocks: Always # Works with clang-format >= 14

@@ -1,0 +1,6 @@
+*
+!**/.clang-format
+!**/*.cc
+!**/*.hh
+!**/CMakeLists.txt
+!**/.gitignore
