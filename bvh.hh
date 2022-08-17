@@ -17,7 +17,7 @@ inline bool all_less_than(const Vec3 &a, const Vec3 &b) {
   return (a.x < b.x) && (a.y < b.y) && (a.z < b.z);
 }
 
-int signof(float &value, float &&epsilon) {
+int signof(const float &value, const float &&epsilon) {
   if (value > epsilon) {
     return 1;
   }
@@ -27,7 +27,7 @@ int signof(float &value, float &&epsilon) {
   return 0;
 }
 
-class BVH : NonCopyable {
+class BVH : public NonCopyable {
 
 public:
   struct BBox {
@@ -85,12 +85,15 @@ public:
         // Coplanar case
       }
 
+      // Intersect segment supporting ray with triangle supporting plane
+      // https://stackoverflow.com/a/23976134/8094047
       Vec3 ray_direction = (verts[1] - verts[0]).normalized();
       Vec3 normal = normal_unnormalized.normalized();
       float denom = normal.dot(ray_direction);
       float t = (triangle.verts[0] - verts[0]).dot(normal) / denom;
       Vec3 intersection_point = t * ray_direction + verts[0];
       // TODO: check if intersection point is inside the triangle
+      // https://blackpawn.com/texts/pointinpoly/
 
       return {};
     }
@@ -103,7 +106,7 @@ public:
 
     bool is_leaf() const { return (left == nullptr) && (right == nullptr); };
 
-    int triangles_count() const { return end - start + 1; }
+    size_t triangles_count() const { return end - start + 1; }
 
     bool does_overlap(const Node &other) const {
       return all_greater_than(bbox.max, other.bbox.min) &&
@@ -120,13 +123,13 @@ private:
   Node *nodes;
   int num_used_nodes;
 
-  void recalc_bounds(Node *node, const std::vector<Triangle> &tris) {
+  static void recalc_bounds(Node *node, const std::vector<Triangle> &tris) {
     node->bbox.max = -INFINITY;
     node->bbox.min = INFINITY;
-    tassert(node->start >= tris.begin());
-    tassert(node->start <= tris.end());
-    tassert(node->end >= tris.begin());
-    tassert(node->end <= tris.end());
+    tassert(node->start >= tris.begin())
+    tassert(node->start <= tris.end())
+    tassert(node->end >= tris.begin())
+    tassert(node->end <= tris.end())
 
     for (auto tri_iter = node->start; tri_iter < node->end; tri_iter++) {
       for (int i = 0; i < 3; i++) {
@@ -148,7 +151,7 @@ private:
     if (dims.z > dims[split_axis]) {
       split_axis = 2;
     }
-    float split_pos = root->bbox.min[split_axis] + dims[split_axis] * .5;
+    float split_pos = root->bbox.min[split_axis] + dims[split_axis] * .5f;
 
     auto it = std::partition(root->start, root->end, [=](const Triangle &t) {
       return t.centroid_cached[split_axis] < split_pos;
@@ -204,7 +207,7 @@ private:
 
 public:
   BVH(std::vector<Triangle> &tris) {
-    if (tris.size() == 0) {
+    if (tris.empty()) {
       return;
     }
     nodes = new Node[2 * tris.size() - 1];
