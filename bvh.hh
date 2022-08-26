@@ -71,8 +71,8 @@ public:
   };
 
   struct Segment_Triangle_Intersection_Result {
-    std::array<Vec3, 2>
-        points; // Array to hold maximum number of resulting points
+    // Array to hold maximum number of resulting points
+    std::array<Vec3, 2> points;
     size_t points_num;
   };
 
