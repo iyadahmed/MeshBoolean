@@ -81,10 +81,35 @@ public:
         return {{}, 0};
       }
 
+      Vec3 const &A = triangle.verts[0];
+      Vec3 const &B = triangle.verts[1];
+      Vec3 const &C = triangle.verts[2];
+
+      // Barycentric vectors
+      // https://blackpawn.com/texts/pointinpoly/
+      // TODO: abstract this to be reusable to perform point in triangle query
+      // multiple times for same triangle
+      Vec3 v0 = C - A;
+      Vec3 v1 = B - A;
+      float dot00 = dot(v0, v0);
+      float dot01 = dot(v0, v1);
+      float dot11 = dot(v1, v1);
+      float inv_denom = 1 / (dot00 * dot11 - dot01 * dot01);
+
       if ((sign1 == 0) && (sign2 == 0)) {
         // Coplanar case
+        /* TODO:
+        1. if any point of the two segment points are inside triangle, include
+        it in the intersection result
+        2. if both points are inside triangle return that result
+        3. if not, intersect segment with all triangle segments
+        4. note there might be no intersections, if the segment doesn't
+        intersect any of triangle segments, nor does it have any point inside
+        triangle
+        */
       }
 
+      // Non-coplanar case
       // Intersect segment supporting ray with triangle supporting plane
       // https://stackoverflow.com/a/23976134/8094047
       Vec3 ray_direction = (verts[1] - verts[0]).normalized();
@@ -92,8 +117,17 @@ public:
       float denom = normal.dot(ray_direction);
       float t = (triangle.verts[0] - verts[0]).dot(normal) / denom;
       Vec3 intersection_point = t * ray_direction + verts[0];
-      // TODO: check if intersection point is inside the triangle
-      // https://blackpawn.com/texts/pointinpoly/
+
+      Vec3 v2 = intersection_point - A;
+      float dot02 = dot(v0, v2);
+      float dot12 = dot(v1, v2);
+      float u = (dot11 * dot02 - dot01 * dot12) * inv_denom;
+      float v = (dot00 * dot12 - dot01 * dot02) * inv_denom;
+      bool is_inside = (u >= 0) && (v >= 0) && (u + v < 1);
+
+      if (is_inside) {
+        return {{intersection_point, {}}, 1};
+      }
 
       return {};
     }
