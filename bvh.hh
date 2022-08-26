@@ -304,7 +304,7 @@ bool intersect_ray_aabb(const BVH::Ray &ray, const Vec3 &bmin,
   float tmax = std::max(tx1, tx2);
   float ty1 = (bmin.y - ray.origin.y) / ray.direction.y;
   float ty2 = (bmax.y - ray.origin.y) / ray.direction.y;
-  float tmin = std::max(tmin, std::min(ty1, ty2));
+  tmin = std::max(tmin, std::min(ty1, ty2));
   tmax = std::min(tmax, std::max(ty1, ty2));
   float tz1 = (bmin.z - ray.origin.z) / ray.direction.z;
   float tz2 = (bmax.z - ray.origin.z) / ray.direction.z;
