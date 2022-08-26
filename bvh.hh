@@ -146,7 +146,7 @@ public:
 
     bool is_leaf() const { return (left == nullptr) && (right == nullptr); };
 
-    size_t triangles_count() const { return end - start + 1; }
+    size_t triangles_count() const { return std::distance(start, end); }
 
     bool does_overlap(const Node &other) const {
       return all_greater_than(bbox.max, other.bbox.min) &&
