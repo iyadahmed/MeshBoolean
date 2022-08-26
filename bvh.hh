@@ -126,10 +126,11 @@ private:
   static void recalc_bounds(Node *node, const std::vector<Triangle> &tris) {
     node->bbox.max = -INFINITY;
     node->bbox.min = INFINITY;
-    tassert(node->start >= tris.begin())
-    tassert(node->start <= tris.end())
-    tassert(node->end >= tris.begin())
-    tassert(node->end <= tris.end())
+
+    tassert(node->start >= tris.begin());
+    tassert(node->start <= tris.end());
+    tassert(node->end >= tris.begin());
+    tassert(node->end <= tris.end());
 
     for (auto tri_iter = node->start; tri_iter < node->end; tri_iter++) {
       for (int i = 0; i < 3; i++) {
