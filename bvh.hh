@@ -42,6 +42,10 @@ public:
   struct Triangle {
     std::array<Vec3, 3> verts;
     Vec3 centroid_cached;
+
+    Vec3 calc_normal() const {
+      return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized();
+    }
   };
 
   struct BarycentricInfo {
@@ -90,13 +94,10 @@ public:
     intersect_triangle(const Triangle &triangle) const {
       Vec3 s1 = verts[0] - triangle.verts[0];
       Vec3 s2 = verts[1] - triangle.verts[0];
+      Vec3 triangle_normal = triangle.calc_normal();
 
-      Vec3 t1 = triangle.verts[1] - triangle.verts[0];
-      Vec3 t2 = triangle.verts[2] - triangle.verts[0];
-      Vec3 normal_unnormalized = t1.cross(t2);
-
-      float d1 = std::abs(normal_unnormalized.dot(s1));
-      float d2 = std::abs(normal_unnormalized.dot(s2));
+      float d1 = std::abs(triangle_normal.dot(s1));
+      float d2 = std::abs(triangle_normal.dot(s2));
 
       int sign1 = signof(d1, 0.0001f);
       int sign2 = signof(d2, 0.0001f);
@@ -126,9 +127,8 @@ public:
       // Intersect segment supporting ray with triangle supporting plane
       // https://stackoverflow.com/a/23976134/8094047
       Vec3 ray_direction = (verts[1] - verts[0]).normalized();
-      Vec3 normal = normal_unnormalized.normalized();
-      float denom = normal.dot(ray_direction);
-      float t = (triangle.verts[0] - verts[0]).dot(normal) / denom;
+      float denom = triangle_normal.dot(ray_direction);
+      float t = (triangle.verts[0] - verts[0]).dot(triangle_normal) / denom;
       Vec3 intersection_point = t * ray_direction + verts[0];
 
       if (binfo.is_inside_triangle(intersection_point)) {
