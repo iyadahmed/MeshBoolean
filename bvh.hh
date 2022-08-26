@@ -135,7 +135,7 @@ public:
         return {{intersection_point, {}}, 1};
       }
 
-      return {};
+      return {{}, 0};
     }
   };
 
