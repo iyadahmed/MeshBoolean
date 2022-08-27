@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   }
 
   auto tris = read_binary_stl_unchecked(argv[1]);
-  std::cout << tris.size() << std::endl;
+  std::cout << "Number of triangles = " << tris.size() << std::endl;
 
   std::vector<BVH::Triangle> bvh_tris;
   for (const auto &t : tris) {
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
   BVH bvh(bvh_tris);
 
-  std::cout << bvh.calc_number_of_nodes() << std::endl;
+  std::cout << "Number of BVH nodes = " << bvh.calc_number_of_nodes() << std::endl;
 
   // Timer t;
   // BVH bvh(input_tris);
