@@ -40,24 +40,24 @@ public:
   };
 
   struct Triangle {
-    std::array<Vec3, 3> verts;
+    std::array<Vec3, 3> points;
     Vec3 centroid_cached;
 
     Vec3 calc_normal() const {
-      return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized();
+      return (points[1] - points[0]).cross(points[2] - points[0]).normalized();
     }
   };
 
-  struct BarycentricInfo {
+  struct Barycentric_Info {
     // https://blackpawn.com/texts/pointinpoly/
     Vec3 triangle_v0;
     Vec3 v0, v1;
     float dot00, dot01, dot11, inv_denom;
 
-    explicit BarycentricInfo(Triangle const &triangle) {
-      triangle_v0 = triangle.verts[0];
-      v0 = triangle.verts[2] - triangle.verts[0];
-      v1 = triangle.verts[1] - triangle.verts[0];
+    explicit Barycentric_Info(Triangle const &triangle) {
+      triangle_v0 = triangle.points[0];
+      v0 = triangle.points[2] - triangle.points[0];
+      v1 = triangle.points[1] - triangle.points[0];
       dot00 = dot(v0, v0);
       dot01 = dot(v0, v1);
       dot11 = dot(v1, v1);
@@ -77,7 +77,7 @@ public:
   struct Segment_Triangle_Intersection_Result {
     // Array to hold maximum number of resulting points
     std::array<Vec3, 2> points;
-    size_t points_num;
+    size_t points_num = 0;
   };
 
   struct Segment {
@@ -92,8 +92,8 @@ public:
 
     Segment_Triangle_Intersection_Result
     intersect_triangle(const Triangle &triangle) const {
-      Vec3 s1 = verts[0] - triangle.verts[0];
-      Vec3 s2 = verts[1] - triangle.verts[0];
+      Vec3 s1 = verts[0] - triangle.points[0];
+      Vec3 s2 = verts[1] - triangle.points[0];
       Vec3 triangle_normal = triangle.calc_normal();
 
       float d1 = std::abs(triangle_normal.dot(s1));
@@ -108,7 +108,7 @@ public:
         return {{}, 0};
       }
 
-      BarycentricInfo binfo(triangle);
+      Barycentric_Info binfo(triangle);
 
       if ((sign1 == 0) && (sign2 == 0)) {
         // Coplanar case
@@ -128,7 +128,7 @@ public:
       // https://stackoverflow.com/a/23976134/8094047
       Vec3 ray_direction = (verts[1] - verts[0]).normalized();
       float denom = triangle_normal.dot(ray_direction);
-      float t = (triangle.verts[0] - verts[0]).dot(triangle_normal) / denom;
+      float t = (triangle.points[0] - verts[0]).dot(triangle_normal) / denom;
       Vec3 intersection_point = t * ray_direction + verts[0];
 
       if (binfo.is_inside_triangle(intersection_point)) {
@@ -140,7 +140,7 @@ public:
   };
 
   struct Node {
-    Node *left, *right;
+    Node *left = nullptr, *right = nullptr;
     BBox bbox;
     std::vector<Triangle>::iterator start, end;
 
@@ -174,8 +174,8 @@ private:
 
     for (auto tri_iter = node->start; tri_iter < node->end; tri_iter++) {
       for (int i = 0; i < 3; i++) {
-        node->bbox.max.max(tri_iter->verts[i]);
-        node->bbox.min.min(tri_iter->verts[i]);
+        node->bbox.max.max(tri_iter->points[i]);
+        node->bbox.min.min(tri_iter->points[i]);
       }
     }
   }
@@ -254,7 +254,7 @@ public:
     nodes = new Node[2 * tris.size() - 1];
 
     for (Triangle &t : tris) {
-      t.centroid_cached = (t.verts[0] + t.verts[1] + t.verts[2]) / 3;
+      t.centroid_cached = (t.points[0] + t.points[1] + t.points[2]) / 3;
     }
 
     Node *root = nodes;
@@ -272,15 +272,15 @@ public:
 };
 
 void intersect_ray_tri(BVH::Ray &ray, const BVH::Triangle &tri) {
-  const Vec3 edge1 = tri.verts[1] - tri.verts[0];
-  const Vec3 edge2 = tri.verts[2] - tri.verts[0];
+  const Vec3 edge1 = tri.points[1] - tri.points[0];
+  const Vec3 edge2 = tri.points[2] - tri.points[0];
   const Vec3 h = cross(ray.direction, edge2);
   const float a = dot(edge1, h);
   if (a > -0.0001f && a < 0.0001f) {
     return; // ray parallel to triangle
   }
   const float f = 1 / a;
-  const Vec3 s = ray.origin - tri.verts[0];
+  const Vec3 s = ray.origin - tri.points[0];
   const float u = f * dot(s, h);
   if (u < 0 || u > 1) {
     return;
