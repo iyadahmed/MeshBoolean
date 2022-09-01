@@ -205,7 +205,7 @@ private:
 
     Node *left = nodes + (num_used_nodes++);
     left->start = root->start;
-    left->end = it - 1;
+    left->end = it;
     recalc_bounds(left, tris);
     left->left = left->right = nullptr;
 
