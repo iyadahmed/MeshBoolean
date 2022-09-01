@@ -27,7 +27,8 @@ struct STLBinaryTriangle {
 
 #pragma pack(pop)
 
-std::vector<STLBinaryTriangle> read_binary_stl_unchecked(std::string const &filename) {
+std::vector<STLBinaryTriangle>
+read_binary_stl_unchecked(std::string const &filename) {
   std::ifstream file(filename);
   uint8_t header[80];
   uint32_t tris_num;
