@@ -97,9 +97,11 @@ private:
 
     size_t left_first_index = first_index;
     size_t left_last_index = partition_last;
+    tassert(left_first_index <= left_last_index);
 
     size_t right_first_index = partition_last + 1;
     size_t right_last_index = last_index;
+    tassert(right_first_index <= right_last_index);
 
     Vec3 const &central_point = (bbmax + bbmin) * 0.5f;
 
