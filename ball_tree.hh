@@ -97,37 +97,39 @@ private:
     }
     float split_pos = bbmin[split_axis] + bbdims[split_axis] * .5f;
 
-    size_t i = first_index;
-    size_t k = last_index;
-    while (i <= k) {
-      if (points[i][split_axis] < split_pos) {
-        i++;
+    size_t partition_start = first_index;
+    size_t partition_last = last_index;
+    while (partition_start <= partition_last) {
+      if (points[partition_start][split_axis] < split_pos) {
+        partition_start++;
       } else {
-        std::swap(points[i], points[k]);
-        k--;
+        std::swap(points[partition_start], points[partition_last]);
+        partition_last--;
       }
     }
 
-    if (i == first_index || k == last_index) {
+    if (partition_start == first_index || partition_last == last_index) {
       return std::numeric_limits<size_t>::max();
     }
 
     size_t left_first_index = first_index;
-    size_t left_last_index = k;
-    size_t right_first_index = k + 1;
+    size_t left_last_index = partition_last;
+
+    size_t right_first_index = partition_last + 1;
     size_t right_last_index = last_index;
+
+    Vec3 const &central_point = (bbmax + bbmin) * 0.5f;
 
     size_t new_node_index = get_new_node_index();
     tassert(new_node_index < cap_ && new_node_index >= 0);
     Node &new_node = nodes_[new_node_index];
     new_node = {};
-    //    new_node.pivot = *central_point;
-    // TODO: calculate radius
+    new_node.pivot = central_point;
     new_node.radius = std::numeric_limits<size_t>::min();
-    //    for (auto const &p : points) {
-    //      new_node.radius =
-    //          std::max(new_node.radius, (p - *central_point).length());
-    //    }
+    for (size_t i = first_index; i < last_index; i++) {
+      new_node.radius =
+          std::max(new_node.radius, (central_point - points[i]).length());
+    }
 
     new_node.left =
         construct_ball_tree(points, left_first_index, left_last_index);
