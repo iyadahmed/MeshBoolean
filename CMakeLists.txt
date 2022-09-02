@@ -9,6 +9,7 @@ add_executable(meshboolean
         vec3.hh
         non_copyable.hh
         timers.hh
+        ball_tree2.hh
         )
 
 add_executable(partition_playground

@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "ball_tree.hh"
+#include "ball_tree2.hh"
 #include "bvh.hh"
 #include "meshio.hh"
 #include "timers.hh"
@@ -32,10 +33,17 @@ int main(int argc, char **argv) {
   }
 
   Timer timer;
-  Ball_Tree ball_tree(vertices);
+  Ball_Tree2 ball_tree(vertices);
   timer.tock("Constructing Ball Tree");
-  std::cout << "Number of Ball Tree nodes = "
-            << ball_tree.calc_number_of_nodes(0) << std::endl;
+  std::cout << "Number of Ball Tree leaf nodes = " << ball_tree.count_leaf_nodes(0)
+            << std::endl;
+  tassert(ball_tree.count_leaf_nodes(0) == vertices.size());
+
+  //  for (const auto &v : vertices) {
+  //  if (not ball_tree.has_close_point(vertices[0], .001)) {
+  //    throw;
+  //  }
+  //  }
 
   timer.tick();
   BVH bvh(bvh_tris);
