@@ -25,22 +25,6 @@ private:
   size_t cap_;
   size_t size_;
   std::vector<size_t> indices;
-  //
-  //  size_t create_new_node() {
-  //    if (size_ == cap_) {
-  //      // Allocate new nodes_ array
-  //      cap_ *= 2;
-  //      Ball_Tree_Node *new_nodes = new Ball_Tree_Node[cap_]{};
-  //      // Copy old items
-  //      for (size_t i = 0; i < size_; i++) {
-  //        new_nodes[i] = nodes_[i];
-  //      }
-  //      // Free old memory and set pointer to new nodes_ array
-  //      delete[] nodes_;
-  //      nodes_ = new_nodes;
-  //    }
-  //    return size_++;
-  //  }
 
 public:
   explicit Ball_Tree(std::vector<Vec3> &points) {
