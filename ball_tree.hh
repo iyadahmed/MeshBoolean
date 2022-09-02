@@ -21,20 +21,19 @@ private:
   };
 
 private:
-  Node *nodes_;
-  size_t cap_;
-  size_t size_;
+  size_t num_used_nodes_;
+  std::vector<Node> nodes_;
 
 public:
   explicit Ball_Tree(std::vector<Vec3> &points) {
     tassert(not points.empty());
-    cap_ = 2 * points.size(); // Should hold enough nodes for binary tree
-    size_ = 0;
-    nodes_ = new Node[cap_]{};
+    num_used_nodes_ = 0;
+
+    // Should hold enough nodes for binary tree
+    nodes_.resize(2 * points.size());
+
     construct_ball_tree(points, 0, points.size() - 1);
   }
-
-  ~Ball_Tree() { delete[] nodes_; }
 
   size_t calc_number_of_nodes(size_t node_index) {
     if (node_index == std::numeric_limits<size_t>::max()) {
@@ -46,12 +45,13 @@ public:
 
 private:
   size_t get_new_node_index() {
-    tassert(size_ < cap_);
-    return size_++;
+    tassert(num_used_nodes_ < nodes_.size());
+    return num_used_nodes_++;
   }
 
   size_t construct_ball_tree(std::vector<Vec3> &points, size_t first_index,
                              size_t last_index) {
+    // TODO: refactor to be non recursive
     tassert(first_index <= last_index);
     if (last_index == first_index) {
       size_t leaf_node_index = get_new_node_index();
@@ -106,7 +106,7 @@ private:
     Vec3 const &central_point = (bbmax + bbmin) * 0.5f;
 
     size_t new_node_index = get_new_node_index();
-    tassert(new_node_index < cap_ && new_node_index >= 0);
+    tassert(new_node_index < nodes_.size() && new_node_index >= 0);
     Node &new_node = nodes_[new_node_index];
     new_node = {};
     new_node.pivot = central_point;
