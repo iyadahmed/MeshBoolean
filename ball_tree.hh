@@ -24,7 +24,6 @@ private:
   Node *nodes_;
   size_t cap_;
   size_t size_;
-  std::vector<size_t> indices;
 
 public:
   explicit Ball_Tree(std::vector<Vec3> &points) {
