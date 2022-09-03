@@ -13,7 +13,7 @@ struct Vec3 {
 
   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
-  Vec3(const float buf[3]) {
+  explicit Vec3(const float buf[3]) {
     x = buf[0];
     y = buf[1];
     z = buf[2];
@@ -80,6 +80,13 @@ struct Vec3 {
   Vec3 normalized() const {
     float l = length();
     return {x / l, y / l, z / l};
+  }
+
+  Vec3 elementwise_squared() const { return {x * x, y * y, z * z}; }
+
+  // Element-wise multiplication
+  Vec3 operator*(const Vec3 &other) const {
+    return {x * other.x, y * other.y, z * other.z};
   }
 
   Vec3 operator+(const Vec3 &other) const {

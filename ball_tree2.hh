@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "common.hh"
+#include "statistics.hh"
 #include "vec3.hh"
 
 class Ball_Tree2 {
@@ -68,15 +69,23 @@ public:
       return leaf_node_index;
     }
 
-    Vec3 mean(0.0f);
     size_t n = last_index - first_index + 1;
+
+    RunningStat<Vec3> running_stat;
     for (size_t i = first_index; i <= last_index; i++) {
-      mean += points[i] / n;
+      running_stat.push(points[i]);
     }
-    Vec3 variance(0.0f);
-    for (size_t i = first_index; i <= last_index; i++) {
-      variance += (points[i] - mean).elementwise_squared() / n;
-    }
+    auto variance = running_stat.get_variance();
+
+    // Naive variance computation
+    //    Vec3 mean(0.0f);
+    //    for (size_t i = first_index; i <= last_index; i++) {
+    //      mean += points[i] / n;
+    //    }
+    //    Vec3 variance(0.0f);
+    //    for (size_t i = first_index; i <= last_index; i++) {
+    //      variance += (points[i] - mean).elementwise_squared() / n;
+    //    }
 
     size_t greatest_variance_aixs = 0;
     if (variance[1] > variance[0]) {
