@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <limits>
 #include <vector>
@@ -67,8 +68,36 @@ public:
       return leaf_node_index;
     }
 
+    Vec3 mean(0.0f);
+    size_t n = last_index - first_index + 1;
+    for (size_t i = first_index; i <= last_index; i++) {
+      mean += points[i] / n;
+    }
+    Vec3 variance(0.0f);
+    for (size_t i = first_index; i <= last_index; i++) {
+      variance += (points[i] - mean).elementwise_squared() / n;
+    }
+
+    size_t greatest_variance_aixs = 0;
+    if (variance[1] > variance[0]) {
+      greatest_variance_aixs = 1;
+    }
+    if (variance[2] > variance[greatest_variance_aixs]) {
+      greatest_variance_aixs = 2;
+    }
+
+    auto first_it = points.begin() + first_index;
+    auto one_past_end_it = points.begin() + last_index + 1;
+    auto median_it = points.begin() + (n - 1) / 2;
+
+    std::nth_element(first_it, median_it, one_past_end_it,
+                     [=](const Vec3 &a, const Vec3 &b) {
+                       return a[greatest_variance_aixs] <
+                              b[greatest_variance_aixs];
+                     });
+
     size_t left_first_index = first_index;
-    size_t left_last_index = (last_index + first_index) / 2;
+    size_t left_last_index = first_index + (n - 1) / 2;
     tassert(left_first_index <= left_last_index);
 
     size_t right_first_index = left_last_index + 1;
