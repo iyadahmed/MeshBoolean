@@ -115,6 +115,12 @@ public:
 
     size_t new_node_index = get_new_node_index();
     Node &new_node = nodes_[new_node_index];
+    new_node.radius = std::numeric_limits<float>::min();
+    for (size_t i = first_index; i <= last_index; i++) {
+      new_node.radius =
+          std::max(new_node.radius, (points[i] - (*median_it)).length());
+    }
+
     new_node.left_child_index =
         construct_ball_tree(points, left_first_index, left_last_index);
     new_node.right_child_index =
