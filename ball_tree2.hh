@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <limits>
+#include <queue>
 #include <vector>
 
 #include "common.hh"
@@ -126,5 +127,37 @@ public:
     new_node.right_child_index =
         construct_ball_tree(points, right_first_index, right_last_index);
     return new_node_index;
+  }
+
+  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k) {
+    knn_search(output, query, k, nodes_[0]);
+  }
+
+private:
+  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
+                  Node const &node) {
+    if (distance(node.center, query) - node.radius >=
+        distance(query, output.front())) {
+      return;
+    } else if (node.is_leaf()) {
+      if (distance(query, node.center) < distance(query, output.front())) {
+        output.push(node.center);
+        if (output.size() > k) {
+          output.pop();
+        }
+      }
+    } else {
+      Node const &left_node = nodes_[node.left_child_index];
+      Node const &right_node = nodes_[node.right_child_index];
+      bool is_right_closer = distance(query, right_node.center) <
+                             distance(query, left_node.center);
+      if (is_right_closer) {
+        knn_search(output, query, k, right_node);
+        knn_search(output, query, k, left_node);
+      } else {
+        knn_search(output, query, k, left_node);
+        knn_search(output, query, k, right_node);
+      }
+    }
   }
 };

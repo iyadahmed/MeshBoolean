@@ -84,6 +84,8 @@ struct Vec3 {
 
   Vec3 elementwise_squared() const { return {x * x, y * y, z * z}; }
 
+  float distance(const Vec3 &other) const { return (*this - other).length(); }
+
   // Element-wise multiplication
   Vec3 operator*(const Vec3 &other) const {
     return {x * other.x, y * other.y, z * other.z};
@@ -147,3 +149,5 @@ struct Vec3 {
 inline Vec3 cross(const Vec3 &a, const Vec3 &b) { return a.cross(b); }
 
 inline float dot(const Vec3 &a, const Vec3 &b) { return a.dot(b); }
+
+inline float distance(const Vec3 &a, const Vec3 &b) { return a.distance(b); }
