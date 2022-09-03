@@ -58,6 +58,17 @@ public:
            count_leaf_nodes(nodes_[node_index].right_child_index);
   }
 
+  void print_leaf_nodes(size_t node_index) {
+    if (node_index == Node::INVALID_INDEX) {
+      return;
+    }
+    if (nodes_[node_index].is_leaf()) {
+      std::cout << nodes_[node_index].center << std::endl;
+    }
+    print_leaf_nodes(nodes_[node_index].left_child_index);
+    print_leaf_nodes(nodes_[node_index].right_child_index);
+  }
+
   size_t construct_ball_tree(std::vector<Vec3> &points, size_t first_index,
                              size_t last_index) {
     // TODO: refactor to be non recursive
@@ -116,6 +127,10 @@ public:
 
     size_t new_node_index = get_new_node_index();
     Node &new_node = nodes_[new_node_index];
+
+    tassert(median_it >= points.begin() && median_it < points.end());
+
+    new_node.center = *median_it;
     new_node.radius = std::numeric_limits<float>::min();
     for (size_t i = first_index; i <= last_index; i++) {
       new_node.radius =
@@ -136,17 +151,33 @@ public:
 private:
   void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
                   Node const &node) {
-    if (distance(query, node.center) - node.radius >=
-        distance(query, output.front())) {
-      return;
+
+    // TODO: refactor
+    if (not output.empty()) {
+
+      if (distance(query, node.center) - node.radius >=
+          distance(query, output.front())) {
+        return;
+      }
+
     } else if (node.is_leaf()) {
-      if (distance(query, node.center) < distance(query, output.front())) {
+
+      if (output.empty()) {
         output.push(node.center);
-        if (output.size() > k) {
-          output.pop();
+
+      } else {
+
+        if (distance(query, node.center) < distance(query, output.front())) {
+          output.push(node.center);
+          if (output.size() > k) {
+            output.pop();
+          }
         }
       }
+
     } else {
+      tassert(node.left_child_index != Node::INVALID_INDEX);
+      tassert(node.right_child_index != Node::INVALID_INDEX);
       Node const &left_node = nodes_[node.left_child_index];
       Node const &right_node = nodes_[node.right_child_index];
       bool is_right_closer = distance(query, right_node.center) <
