@@ -170,7 +170,7 @@ private:
     }
   }
 
-  // FIXME: implement KNN search
+  // FIXME: implement KNN search correctly
 
   //  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
   //                  Node const &node) {
