@@ -1,8 +1,9 @@
+#include <cstdio>
 #include <iostream>
+#include <numeric>
 #include <queue>
 #include <vector>
 
-#include "ball_tree.hh"
 #include "ball_tree2.hh"
 #include "bvh.hh"
 #include "meshio.hh"
@@ -33,23 +34,40 @@ int main(int argc, char **argv) {
     }
   }
 
-  Timer timer;
+  //  std::vector<Vec3> vertices;
+  //  vertices.push_back(Vec3(-294.6, -56.9, -174.3));
+  //  vertices.push_back(Vec3(-251.1, -145.1, -48.2));
+
+  //  Timer timer;
   Ball_Tree2 ball_tree(vertices);
-  timer.tock("Constructing Ball Tree");
-  std::cout << "Number of Ball Tree leaf nodes = "
-            << ball_tree.count_leaf_nodes(0) << std::endl;
+  //  timer.tock("Constructing Ball Tree");
+  //  std::cout << "Number of Ball Tree leaf nodes = "
+  //            << ball_tree.count_leaf_nodes(0) << std::endl;
   tassert(ball_tree.count_leaf_nodes(0) == vertices.size());
 
-  std::queue<Vec3> Q;
-  ball_tree.knn_search(Q, vertices[0], 1);
-  std::cout << vertices[0] << std::endl;
-  std::cout << Q.front() << std::endl;
+  //  std::cout << ball_tree.point_exists(vertices[0], .0001) << std::endl;
 
+  //  std::queue<Vec3> Q;
+  //  ball_tree.knn_search(Q, vertices[1], 2);
+  //
+  //  std::cout << "Vertices: " << std::endl;
   //  for (const auto &v : vertices) {
-  //  if (not ball_tree.has_close_point(vertices[0], .001)) {
-  //    throw;
+  //    std::cout << v << std::endl;
   //  }
+  //
+  //  std::cout << "Queue: " << std::endl;
+  //  while (not Q.empty()) {
+  //    std::cout << Q.front() << std::endl;
+  //    Q.pop();
   //  }
+
+  //  timer.tick();
+  for (size_t i = 0; i < vertices.size() / 1000; i++) {
+    if (not ball_tree.point_exists(vertices[i], .001)) {
+      throw;
+    }
+  }
+  //  timer.tock("");
 
   //  timer.tick();
   //  BVH bvh(bvh_tris);

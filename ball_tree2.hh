@@ -144,51 +144,75 @@ public:
     return new_node_index;
   }
 
-  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k) {
-    knn_search(output, query, k, nodes_[0]);
+  //  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k) {
+  //    knn_search(output, query, k, nodes_[0]);
+  //  }
+
+  bool point_exists(Vec3 const &query, float radius) const {
+    return point_exists(query, nodes_[0], radius);
   }
 
 private:
-  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
-                  Node const &node) {
-
-    // TODO: refactor
-    if (not output.empty()) {
-
-      if (distance(query, node.center) - node.radius >=
-          distance(query, output.front())) {
-        return;
-      }
-
-    } else if (node.is_leaf()) {
-
-      if (output.empty()) {
-        output.push(node.center);
-
-      } else {
-
-        if (distance(query, node.center) < distance(query, output.front())) {
-          output.push(node.center);
-          if (output.size() > k) {
-            output.pop();
-          }
-        }
-      }
-
+  bool point_exists(Vec3 const &query, Node const &node, float radius) const {
+    float d = distance(query, node.center);
+    if (d > (node.radius + radius)) {
+      // NOTE: this assumes leaf nodes have 0 radius
+      return false;
     } else {
-      tassert(node.left_child_index != Node::INVALID_INDEX);
-      tassert(node.right_child_index != Node::INVALID_INDEX);
-      Node const &left_node = nodes_[node.left_child_index];
-      Node const &right_node = nodes_[node.right_child_index];
-      bool is_right_closer = distance(query, right_node.center) <
-                             distance(query, left_node.center);
-      if (is_right_closer) {
-        knn_search(output, query, k, right_node);
-        knn_search(output, query, k, left_node);
+      if (node.is_leaf()) {
+        return true;
       } else {
-        knn_search(output, query, k, left_node);
-        knn_search(output, query, k, right_node);
+        tassert(node.left_child_index != Node::INVALID_INDEX);
+        tassert(node.right_child_index != Node::INVALID_INDEX);
+        return point_exists(query, nodes_[node.left_child_index], radius) ||
+               point_exists(query, nodes_[node.right_child_index], radius);
       }
     }
   }
+
+  // FIXME: implement KNN search
+
+  //  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
+  //                  Node const &node) {
+  //
+  //    // TODO: refactor
+  //    if (not output.empty()) {
+  //
+  //      if (distance(query, node.center) - node.radius >=
+  //          distance(query, output.front())) {
+  //        return;
+  //      }
+  //
+  //    } else if (node.is_leaf()) {
+  //
+  //      if (output.empty()) {
+  //        output.push(node.center);
+  //
+  //      } else {
+  //
+  //        if (distance(query, node.center) < distance(query, output.front()))
+  //        {
+  //          output.push(node.center);
+  //          if (output.size() > k) {
+  //            output.pop();
+  //          }
+  //        }
+  //      }
+  //
+  //    } else {
+  //      tassert(node.left_child_index != Node::INVALID_INDEX);
+  //      tassert(node.right_child_index != Node::INVALID_INDEX);
+  //      Node const &left_node = nodes_[node.left_child_index];
+  //      Node const &right_node = nodes_[node.right_child_index];
+  //      bool is_right_closer = distance(query, right_node.center) <
+  //                             distance(query, left_node.center);
+  //      if (is_right_closer) {
+  //        knn_search(output, query, k, right_node);
+  //        knn_search(output, query, k, left_node);
+  //      } else {
+  //        knn_search(output, query, k, left_node);
+  //        knn_search(output, query, k, right_node);
+  //      }
+  //    }
+  //  }
 };
