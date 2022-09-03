@@ -48,7 +48,7 @@ public:
   }
 
   size_t count_leaf_nodes(size_t node_index) {
-    if (node_index == std::numeric_limits<size_t>::max()) {
+    if (node_index == Node::INVALID_INDEX) {
       return 0;
     }
     if (nodes_[node_index].is_leaf()) {
