@@ -87,12 +87,12 @@ public:
     //      variance += (points[i] - mean).elementwise_squared() / n;
     //    }
 
-    size_t greatest_variance_aixs = 0;
+    size_t greatest_variance_axis = 0;
     if (variance[1] > variance[0]) {
-      greatest_variance_aixs = 1;
+      greatest_variance_axis = 1;
     }
-    if (variance[2] > variance[greatest_variance_aixs]) {
-      greatest_variance_aixs = 2;
+    if (variance[2] > variance[greatest_variance_axis]) {
+      greatest_variance_axis = 2;
     }
 
     auto first_it = points.begin() + first_index;
@@ -101,8 +101,8 @@ public:
 
     std::nth_element(first_it, median_it, one_past_end_it,
                      [=](const Vec3 &a, const Vec3 &b) {
-                       return a[greatest_variance_aixs] <
-                              b[greatest_variance_aixs];
+                       return a[greatest_variance_axis] <
+                              b[greatest_variance_axis];
                      });
 
     size_t left_first_index = first_index;
