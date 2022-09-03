@@ -1,7 +1,10 @@
+cmake_minimum_required(VERSION 3.16)
 project(MeshBoolean)
 
+#find_package(TBB REQUIRED)
+
 add_executable(meshboolean
-        bvh.cc
+        meshboolean.cc
         bvh.hh
         ball_tree.hh
         common.hh
@@ -12,6 +15,10 @@ add_executable(meshboolean
         ball_tree2.hh
         statistics.hh
         )
+
+target_compile_features(meshboolean PUBLIC cxx_std_14)
+#target_link_libraries(meshboolean PUBLIC TBB::tbb)
+set_target_properties(meshboolean PROPERTIES CXX_EXTENSIONS OFF)
 
 add_executable(partition_playground
         partition_playground.cc
