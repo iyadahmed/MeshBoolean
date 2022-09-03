@@ -6,7 +6,6 @@ project(MeshBoolean)
 add_executable(meshboolean
         meshboolean.cc
         bvh.hh
-        ball_tree.hh
         common.hh
         meshio.hh
         vec3.hh
