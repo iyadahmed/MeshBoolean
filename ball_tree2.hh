@@ -136,7 +136,7 @@ public:
 private:
   void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k,
                   Node const &node) {
-    if (distance(node.center, query) - node.radius >=
+    if (distance(query, node.center) - node.radius >=
         distance(query, output.front())) {
       return;
     } else if (node.is_leaf()) {
