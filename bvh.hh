@@ -230,7 +230,7 @@ private:
            calc_number_of_nodes_(root->right);
   };
 
-  void intersect_segment(const Segment &segment, const Node *node) const {
+  void self_intersection_core(const Segment &segment, const Node *node) {
     if (node == nullptr) {
       return;
     }
@@ -239,11 +239,35 @@ private:
     }
     if (node->is_leaf()) {
       for (auto tri_iter = node->start; tri_iter < node->end; tri_iter++) {
-        segment.intersect_triangle(*tri_iter);
+        self_intersection_segment_triangle_intersection_handler(
+            segment.intersect_triangle(*tri_iter), tri_iter);
       }
     }
-    intersect_segment(segment, node->left);
-    intersect_segment(segment, node->right);
+    self_intersection_core(segment, node->left);
+    self_intersection_core(segment, node->right);
+  }
+
+  struct Intersection_Point_Polar {
+    std::vector<Triangle>::iterator tri_iter;
+    float angle;
+    float distance_squared;
+  };
+
+  std::vector<Intersection_Point_Polar> self_intersection_points;
+
+  void self_intersection_segment_triangle_intersection_handler(
+      Segment_Triangle_Intersection_Result const &intersection,
+      std::vector<Triangle>::iterator tri_iter) {
+    for (size_t i = 0; i < intersection.points_num; i++) {
+      Vec3 p3d = intersection.points[i] - tri_iter->points[0];
+      Vec3 basis1 = tri_iter->points[1] - tri_iter->points[0];
+      Vec3 basis2 = tri_iter->points[2] - tri_iter->points[0];
+      float x = p3d.dot(basis1);
+      float y = p3d.dot(basis2);
+      float angle = std::atan2(y, x);
+      float distance_squared = x * x + y * y;
+      self_intersection_points.push_back({tri_iter, angle, distance_squared});
+    }
   }
 
 public:
