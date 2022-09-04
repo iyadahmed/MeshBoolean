@@ -49,7 +49,7 @@ read_binary_stl_tris_unchecked(const char *filename) {
 
   fread(header, sizeof(header), 1, file);
   fread(&tris_num, sizeof(tris_num), 1, file);
-  output.resize(tris_num * 3);
+  output.resize(tris_num);
 
   fread(&output[0], tris_num * sizeof(BinaryTriangle), 1, file);
   fclose(file);
