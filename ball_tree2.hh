@@ -40,6 +40,7 @@ public:
     num_used_nodes_ = 0;
     nodes_.resize(2 * points.size());
     construct_ball_tree(points, 0, points.size() - 1);
+    tassert(count_leaf_nodes(0) == points.size());
   }
 
   size_t get_new_node_index() {

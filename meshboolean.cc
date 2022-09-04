@@ -43,7 +43,6 @@ int main(int argc, char **argv) {
   //  timer.tock("Constructing Ball Tree");
   //  std::cout << "Number of Ball Tree leaf nodes = "
   //            << ball_tree.count_leaf_nodes(0) << std::endl;
-  tassert(ball_tree.count_leaf_nodes(0) == vertices.size());
 
   //  std::cout << ball_tree.point_exists(vertices[0], .0001) << std::endl;
 
