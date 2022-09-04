@@ -7,7 +7,7 @@
 
 #include "common.hh"
 #include "non_copyable.hh"
-#include "vec3.hh"
+//#include "vec3.hh"
 
 inline bool all_greater_than(const Vec3 &a, const Vec3 &b) {
   return (a.x > b.x) && (a.y > b.y) && (a.z > b.z);

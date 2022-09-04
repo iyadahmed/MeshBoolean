@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstdio>
 #include <fstream>
 #include <vector>
 
@@ -17,25 +18,86 @@
  *     UINT16      – Attribute byte count   -  2 bytes
  */
 
-#pragma pack(push, 1)
+namespace meshio::stl {
 
-struct STLBinaryTriangle {
+struct BinaryTriangle {
   Vec3 custom_normal;
-  std::array<Vec3, 3> verts;
+  Vec3 vertices[3];
   uint16_t attribute_byte_count;
 };
 
-#pragma pack(pop)
-
-std::vector<STLBinaryTriangle>
-read_binary_stl_unchecked(std::string const &filename) {
-  std::ifstream file(filename);
+// TODO: reduce code duplication
+std::vector<BinaryTriangle>
+read_binary_stl_tris_unchecked(const char *filename) {
+  FILE *file = fopen(filename, "rb");
   uint8_t header[80];
   uint32_t tris_num;
+  float custom_normal[3];
+  float vert[3];
+  uint16_t attribute_byte_count;
+  std::vector<BinaryTriangle> output;
 
-  file.read((char *)header, 80);
-  file.read((char *)&tris_num, sizeof(uint32_t));
-  std::vector<STLBinaryTriangle> result(tris_num);
-  file.read((char *)result.data(), result.size() * sizeof(STLBinaryTriangle));
-  return result;
+  fread(header, sizeof(header), 1, file);
+  fread(&tris_num, sizeof(tris_num), 1, file);
+  output.resize(tris_num * 3);
+
+  fread(&output[0], tris_num * sizeof(BinaryTriangle), 1, file);
+  fclose(file);
+
+  return output;
 }
+
+std::vector<Vec3> read_binary_stl_vertices_unchecked(const char *filename) {
+  FILE *file = fopen(filename, "rb");
+  uint8_t header[80];
+  uint32_t tris_num;
+  float custom_normal[3];
+  float vert[3];
+  uint16_t attribute_byte_count;
+  std::vector<Vec3> output;
+
+  fread(header, sizeof(header), 1, file);
+  fread(&tris_num, sizeof(tris_num), 1, file);
+  output.reserve(tris_num * 3);
+
+  for (int i = 0; i < tris_num; i++) {
+    fread(custom_normal, sizeof(custom_normal), 1, file);
+    for (int j = 0; j < 3; j++) {
+      fread(vert, sizeof(vert), 1, file);
+      output.emplace_back(vert[0], vert[1], vert[2]);
+    }
+    fread(&attribute_byte_count, sizeof(attribute_byte_count), 1, file);
+  }
+  fclose(file);
+
+  return output;
+}
+
+std::vector<std::pair<size_t, Vec3>>
+read_binary_stl_index_vertex_pairs_unchecked(const char *filename) {
+  FILE *file = fopen(filename, "rb");
+  uint8_t header[80];
+  uint32_t tris_num;
+  float custom_normal[3];
+  float vert[3];
+  uint16_t attribute_byte_count;
+  std::vector<std::pair<size_t, Vec3>> output;
+
+  fread(header, sizeof(header), 1, file);
+  fread(&tris_num, sizeof(tris_num), 1, file);
+  output.reserve(tris_num * 3);
+
+  for (int i = 0; i < tris_num; i++) {
+    fread(custom_normal, sizeof(custom_normal), 1, file);
+    for (int j = 0; j < 3; j++) {
+      fread(vert, sizeof(vert), 1, file);
+      output.emplace_back(i * 3 + j, Vec3{vert[0], vert[1], vert[2]});
+    }
+    fread(&attribute_byte_count, sizeof(attribute_byte_count), 1, file);
+  }
+  fclose(file);
+
+  return output;
+}
+
+} // namespace meshio::stl

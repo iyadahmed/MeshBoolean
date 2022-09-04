@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <cmath>
 #include <ostream>
 
@@ -18,6 +19,8 @@ struct Vec3 {
     y = buf[1];
     z = buf[2];
   }
+
+  Vec3(const std::array<float, 3> &v) : x(v[0]), y(v[1]), z(v[2]) {}
 
   Vec3(float value = 0.0f) { x = y = z = value; }
 
@@ -137,11 +140,11 @@ struct Vec3 {
   }
 
   float &operator[](size_t index) {
-    return reinterpret_cast<float *>(this)[index];
+    return reinterpret_cast<float *>(&x)[index];
   }
 
-  float operator[](size_t index) const {
-    return reinterpret_cast<const float *>(this)[index];
+  const float &operator[](size_t index) const {
+    return reinterpret_cast<const float *>(&x)[index];
   }
 };
 
