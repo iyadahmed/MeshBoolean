@@ -25,7 +25,7 @@ namespace meshio::stl {
 struct BinaryTriangle {
   Vec3 custom_normal;
   Vec3 vertices[3];
-  uint16_t attribute_byte_count;
+  uint16_t attribute_byte_count = 0;
 };
 
 #pragma pack(pop)
