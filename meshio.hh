@@ -5,6 +5,8 @@
 #include <fstream>
 #include <vector>
 
+#include "common.hh"
+#include "non_copyable.hh"
 #include "vec3.hh"
 
 /*  Binary STL spec.:
@@ -30,83 +32,68 @@ struct BinaryTriangle {
 
 #pragma pack(pop)
 
-struct File {
+class BinaryFileReader : NonCopyable {
+private:
+  FILE *file;
   uint8_t header[80];
   uint32_t number_of_triangles;
-  std::vector<BinaryTriangle> triangles;
-};
 
-// TODO: reduce code duplication
-std::vector<BinaryTriangle>
-read_binary_stl_tris_unchecked(const char *filename) {
-  FILE *file = fopen(filename, "rb");
-  uint8_t header[80];
-  uint32_t tris_num;
-  float custom_normal[3];
-  float vert[3];
-  uint16_t attribute_byte_count;
-  std::vector<BinaryTriangle> output;
-
-  fread(header, sizeof(header), 1, file);
-  fread(&tris_num, sizeof(tris_num), 1, file);
-  output.resize(tris_num);
-
-  fread(&output[0], tris_num * sizeof(BinaryTriangle), 1, file);
-  fclose(file);
-
-  return output;
-}
-
-std::vector<Vec3> read_binary_stl_vertices_unchecked(const char *filename) {
-  FILE *file = fopen(filename, "rb");
-  uint8_t header[80];
-  uint32_t tris_num;
-  float custom_normal[3];
-  float vert[3];
-  uint16_t attribute_byte_count;
-  std::vector<Vec3> output;
-
-  fread(header, sizeof(header), 1, file);
-  fread(&tris_num, sizeof(tris_num), 1, file);
-  output.reserve(tris_num * 3);
-
-  for (int i = 0; i < tris_num; i++) {
-    fread(custom_normal, sizeof(custom_normal), 1, file);
-    for (int j = 0; j < 3; j++) {
-      fread(vert, sizeof(vert), 1, file);
-      output.emplace_back(vert[0], vert[1], vert[2]);
+  // fread wrapper with error checking
+  static void fread_e(void *output, size_t size, size_t n, FILE *file) {
+    size_t num_read_items = fread(output, size, n, file);
+    if (num_read_items != n) {
+      if (ferror(file)) {
+        throw std::runtime_error("Error reading file");
+      } else if (feof(file)) {
+        throw std::runtime_error("EOF found");
+      } else {
+        throw std::runtime_error("Unknown file error");
+      }
     }
-    fread(&attribute_byte_count, sizeof(attribute_byte_count), 1, file);
   }
-  fclose(file);
 
-  return output;
-}
+public:
+  explicit BinaryFileReader(const char *filename) {
+    file = fopen(filename, "rb");
+    if (file == nullptr) {
+      throw std::runtime_error("Error opening file");
+    }
+    fread_e(header, sizeof(header), 1, file);
+    fread_e(&number_of_triangles, sizeof(number_of_triangles), 1, file);
+  }
+
+  ~BinaryFileReader() { fclose(file); }
+
+  size_t get_reported_number_of_triangles() const {
+    return number_of_triangles;
+  }
+
+  BinaryTriangle read_next_triangle() {
+    BinaryTriangle output;
+    fread_e(&output, sizeof(BinaryTriangle), 1, file);
+    return output;
+  }
+
+  std::vector<BinaryTriangle> read_all_triangles() {
+    std::vector<BinaryTriangle> output;
+    output.resize(number_of_triangles);
+    fread_e(&output[0], number_of_triangles * sizeof(BinaryTriangle), 1, file);
+    return output;
+  }
+};
 
 std::vector<std::pair<size_t, Vec3>>
 read_binary_stl_index_vertex_pairs_unchecked(const char *filename) {
-  FILE *file = fopen(filename, "rb");
-  uint8_t header[80];
-  uint32_t tris_num;
-  float custom_normal[3];
-  float vert[3];
-  uint16_t attribute_byte_count;
+  BinaryFileReader stl_file_reader(filename);
   std::vector<std::pair<size_t, Vec3>> output;
-
-  fread(header, sizeof(header), 1, file);
-  fread(&tris_num, sizeof(tris_num), 1, file);
-  output.reserve(tris_num * 3);
-
-  for (int i = 0; i < tris_num; i++) {
-    fread(custom_normal, sizeof(custom_normal), 1, file);
-    for (int j = 0; j < 3; j++) {
-      fread(vert, sizeof(vert), 1, file);
+  for (size_t i = 0; i < stl_file_reader.get_reported_number_of_triangles();
+       i++) {
+    auto t = stl_file_reader.read_next_triangle();
+    for (size_t j = 0; j < 3; j++) {
+      const auto &vert = t.vertices[j];
       output.emplace_back(i * 3 + j, Vec3{vert[0], vert[1], vert[2]});
     }
-    fread(&attribute_byte_count, sizeof(attribute_byte_count), 1, file);
   }
-  fclose(file);
-
   return output;
 }
 
