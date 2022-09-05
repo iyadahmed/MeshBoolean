@@ -36,17 +36,21 @@ private:
   std::vector<Node> nodes_;
 
 public:
+  std::vector<Triangle> triangles;
+
+public:
   static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
 
-  explicit BVH2(std::vector<Triangle> &triangles) {
-    num_used_nodes_ = 0;
+  BVH2() { num_used_nodes_ = 0; }
+
+  void update_tree() {
     nodes_.resize(2 * triangles.size());
     size_t root_node_index = get_new_node_index();
     Node &root_node = nodes_[root_node_index];
     root_node.first_primitive_index = 0;
     root_node.last_primitive_index = triangles.size() - 1;
-    update_node_bounds(triangles, root_node_index);
-    subdivide(root_node_index, triangles);
+    update_node_bounds(root_node_index);
+    subdivide(root_node_index);
   }
 
   size_t count_leaf_nodes(size_t node_index) const {
@@ -67,9 +71,7 @@ private:
     return num_used_nodes_++;
   }
 
-  // TODO: get rid of passing reference to triangle vector
-  void update_node_bounds(std::vector<Triangle> const &triangles,
-                          size_t node_index) {
+  void update_node_bounds(size_t node_index) {
     Node &node = nodes_[node_index];
     node.bbmin = std::numeric_limits<float>::infinity();
     node.bbmax = -1 * node.bbmin;
@@ -83,7 +85,7 @@ private:
     }
   }
 
-  void subdivide(size_t parent_node_index, std::vector<Triangle> &triangles) {
+  void subdivide(size_t parent_node_index) {
 
     Node &parent_node = nodes_[parent_node_index];
 
@@ -133,15 +135,15 @@ private:
     Node &left_node = nodes_[parent_node.left_child_index];
     left_node.first_primitive_index = left_first_primitive_index;
     left_node.last_primitive_index = left_last_primitive_index;
-    update_node_bounds(triangles, parent_node.left_child_index);
+    update_node_bounds(parent_node.left_child_index);
 
     parent_node.right_child_index = get_new_node_index();
     Node &right_node = nodes_[parent_node.right_child_index];
     right_node.first_primitive_index = right_first_primitive_index;
     right_node.last_primitive_index = right_last_primitive_index;
-    update_node_bounds(triangles, parent_node.right_child_index);
+    update_node_bounds(parent_node.right_child_index);
 
-    subdivide(parent_node.left_child_index, triangles);
-    subdivide(parent_node.right_child_index, triangles);
+    subdivide(parent_node.left_child_index);
+    subdivide(parent_node.right_child_index);
   }
 };
