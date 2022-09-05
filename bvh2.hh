@@ -39,8 +39,6 @@ public:
   std::vector<Triangle> triangles;
 
 public:
-  static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
-
   BVH2() { num_used_nodes_ = 0; }
 
   void update_tree() {
@@ -66,6 +64,8 @@ public:
   }
 
 private:
+  static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
+
   size_t get_new_node_index() {
     tassert(num_used_nodes_ < nodes_.size());
     return num_used_nodes_++;
