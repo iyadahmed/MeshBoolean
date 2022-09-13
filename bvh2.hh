@@ -7,7 +7,8 @@
 #include "common.hh"
 #include "vec3.hh"
 
-// Initial inspiration https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
+// Initial inspiration
+// https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 class BVH2 {
 
 public:
