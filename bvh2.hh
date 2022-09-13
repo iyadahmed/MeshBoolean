@@ -50,6 +50,7 @@ public:
     root_node.last_primitive_index = triangles.size() - 1;
     update_node_bounds(root_node_index);
     subdivide(root_node_index);
+    tassert(cound_leaf_triangles(0) == triangles.size());
   }
 
   size_t count_leaf_nodes(size_t node_index) const {
@@ -62,6 +63,18 @@ public:
     }
     return count_leaf_nodes(node.left_child_index) +
            count_leaf_nodes(node.right_child_index);
+  }
+
+  size_t cound_leaf_triangles(size_t node_index) const {
+    if (node_index == Node::INVALID_INDEX) {
+      return 0;
+    }
+    Node const &node = nodes_[node_index];
+    if (node.is_leaf()) {
+      return node.last_primitive_index - node.first_primitive_index + 1;
+    }
+    return cound_leaf_triangles(node.left_child_index) +
+           cound_leaf_triangles(node.right_child_index);
   }
 
 private:
