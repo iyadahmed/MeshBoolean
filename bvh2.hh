@@ -78,6 +78,19 @@ public:
            cound_leaf_triangles(node.right_child_index);
   }
 
+  size_t intersect_segment(const Segment &segment, size_t node_index = 0) {
+    Node &node = nodes_[node_index];
+    if (!do_segment_intersect_aabb(segment[0], segment[1], node.bbmin,
+                                   node.bbmax))
+      return 0;
+    if (node.is_leaf()) {
+      return 1;
+    } else {
+      return intersect_segment(segment, node.left_child_index) +
+             intersect_segment(segment, node.right_child_index);
+    }
+  }
+
 private:
   static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
 
@@ -160,5 +173,32 @@ private:
 
     subdivide(parent_node.left_child_index);
     subdivide(parent_node.right_child_index);
+  }
+
+  // From
+  // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
+  bool do_segment_intersect_aabb(const Vec3 &p1, const Vec3 &p2,
+                                 const Vec3 &min, const Vec3 &max) {
+    constexpr float EPSILON = std::numeric_limits<float>::epsilon() * 100;
+    Vec3 d = (p2 - p1) * 0.5f;
+    Vec3 e = (max - min) * 0.5f;
+    Vec3 c = p1 + d - (min + max) * 0.5f;
+    Vec3 ad = d.absolute();
+    if (std::abs(c[0]) > e[0] + ad[0])
+      return false;
+    if (std::abs(c[1]) > e[1] + ad[1])
+      return false;
+    if (std::abs(c[2]) > e[2] + ad[2])
+      return false;
+    if (std::abs(d[1] * c[2] - d[2] * c[1]) >
+        e[1] * ad[2] + e[2] * ad[1] + EPSILON)
+      return false;
+    if (std::abs(d[2] * c[0] - d[0] * c[2]) >
+        e[2] * ad[0] + e[0] * ad[2] + EPSILON)
+      return false;
+    if (std::abs(d[0] * c[1] - d[1] * c[0]) >
+        e[0] * ad[1] + e[1] * ad[0] + EPSILON)
+      return false;
+    return true;
   }
 };

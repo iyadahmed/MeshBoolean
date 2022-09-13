@@ -93,6 +93,8 @@ struct Vec3 {
     return std::abs(length() - 1.0f) < epsilon;
   }
 
+  Vec3 absolute() const { return {std::abs(x), std::abs(y), std::abs(z)}; }
+
   // Element-wise multiplication
   Vec3 operator*(const Vec3 &other) const {
     return {x * other.x, y * other.y, z * other.z};

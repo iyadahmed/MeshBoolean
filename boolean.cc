@@ -30,7 +30,14 @@ int main(int argc, const char *argv[]) {
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes(0)
             << std::endl;
 
-  // TODO: perform self intersection using the BVH
+  BVH2::Segment s;
+  s[0] = {0, 0, 2};
+  s[1] = {0, 0, 1};
+  std::cout << "Number of leaf node intersecting segment "
+            << bvh.intersect_segment(s) << std::endl;
+
+  // TODO: intersect all mesh edges with the mesh itself using the BVH and
+  // collect intersection points
   // TODO: re-triangulate surface
   // TODO: export
 
