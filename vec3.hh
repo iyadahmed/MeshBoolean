@@ -89,6 +89,10 @@ struct Vec3 {
 
   float distance(const Vec3 &other) const { return (*this - other).length(); }
 
+  bool is_normalized(float epsilon = 0.000001f) const {
+    return std::abs(length() - 1.0f) < epsilon;
+  }
+
   // Element-wise multiplication
   Vec3 operator*(const Vec3 &other) const {
     return {x * other.x, y * other.y, z * other.z};
