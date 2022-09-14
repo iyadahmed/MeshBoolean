@@ -1,8 +1,3 @@
-/* Header only 3 component vector library,
- * the main reason to be header only is to allow inlining,
- * which is critical for this data structure, as it is meant to be used in very
- * tight loops (e.g. rendering, processing geometry, etc) */
-
 #pragma once
 
 #include <array>
