@@ -78,7 +78,7 @@ public:
     tassert(cound_leaf_triangles(0) == triangles.size());
   }
 
-  size_t count_leaf_nodes(size_t node_index) const {
+  size_t count_leaf_nodes(size_t node_index = 0) const {
     if (node_index == Node::INVALID_INDEX) {
       return 0;
     }
@@ -90,7 +90,7 @@ public:
            count_leaf_nodes(node.right_child_index);
   }
 
-  size_t cound_leaf_triangles(size_t node_index) const {
+  size_t cound_leaf_triangles(size_t node_index = 0) const {
     if (node_index == Node::INVALID_INDEX) {
       return 0;
     }

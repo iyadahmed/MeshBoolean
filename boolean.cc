@@ -35,8 +35,7 @@ int main(int argc, const char *argv[]) {
   CALLGRIND_STOP_INSTRUMENTATION;
 
   timer.tock("Building BVH");
-  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes(0)
-            << std::endl;
+  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
 
   BVH2::Segment s;
   s[0] = {0, 0, 2};
