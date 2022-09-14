@@ -156,6 +156,39 @@ public:
     }
   }
 
+  struct Intersection_Point {
+    size_t triangle_index;
+    float c1, c2;
+  };
+
+  void intersect(const Segment &segment,
+                 std::vector<Intersection_Point> &output,
+                 size_t node_index = 0) {
+    Node &node = nodes_[node_index];
+    if (!do_segment_intersect_aabb(segment, node.bounding_box))
+      return;
+    if (node.is_leaf()) {
+      for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
+           i++) {
+        const Triangle &t = triangles[i];
+        auto intersection_result =
+            intersect_segment_triangle(segment, t);
+        for (size_t pi = 0; pi < intersection_result.num_points; pi++) {
+          const Vec3 &v = intersection_result.points[pi];
+          Vec3 b1 = t.verts[1] - t.verts[0];
+          Vec3 b2 = t.verts[2] - t.verts[0];
+          Vec3 rel = v - t.verts[0];
+          float c1 = rel.dot(b1);
+          float c2 = rel.dot(b2);
+          output.push_back({i, c1, c2});
+        }
+      }
+    } else {
+      intersect(segment, output, node.left_child_index);
+      intersect(segment, output, node.right_child_index);
+    }
+  }
+
 private:
   static int signof(const float &value, const float &&epsilon) {
     if (value > epsilon) {
@@ -215,6 +248,7 @@ private:
         partition_start++;
       } else {
         tassert(partition_end != 0);
+        // TODO: store triangle indices instead so that swap is faster
         std::swap(triangles[partition_start], triangles[partition_end]);
         partition_end--;
       }
@@ -321,12 +355,60 @@ private:
     float t = (triangle.verts[0] - segment[0]).dot(triangle_normal) / denom;
     Vec3 intersection_point = t * ray_direction + segment[0];
 
-    if (barycentric_info.is_inside_triangle(intersection_point)) {
-      //      return {{intersection_point, {}}, 1};
-      return true;
+    return barycentric_info.is_inside_triangle(intersection_point);
+  }
+
+  struct Segment_Triangle_Intersection_Result {
+    std::array<Vec3, 2> points;
+    size_t num_points = 0;
+  };
+
+  static Segment_Triangle_Intersection_Result
+  intersect_segment_triangle(const Segment &segment, const Triangle &triangle) {
+    Vec3 s1 = segment[0] - triangle.verts[0];
+    Vec3 s2 = segment[1] - triangle.verts[0];
+    Vec3 triangle_normal = triangle.calc_normal();
+
+    float d1 = triangle_normal.dot(s1);
+    float d2 = triangle_normal.dot(s2);
+
+    int sign1 = signof(d1, 0.0001f);
+    int sign2 = signof(d2, 0.0001f);
+
+    if ((sign1 == sign2) && (sign1 != 0)) {
+      // Both segment points are on the same side of the triangle supporting
+      // plane, no intersection is possible
+      return {{}, 0};
     }
 
-    //    return {{}, 0};
-    return false;
+    Barycentric_Info barycentric_info(triangle);
+
+    if ((sign1 == 0) && (sign2 == 0)) {
+      // Coplanar case
+      /* TODO:
+      1. if any point of the two segment points are inside triangle, include
+      it in the intersection result
+      2. if both points are inside triangle return that result
+      3. if not, intersect segment with all triangle segments
+      4. note there might be no intersections, if the segment doesn't
+      intersect any of triangle segments, nor does it have any point inside
+      triangle
+      */
+      return {{}, 0};
+    }
+
+    // Non-coplanar case
+    // Intersect segment supporting ray with triangle supporting plane
+    // https://stackoverflow.com/a/23976134/8094047
+    Vec3 ray_direction = (segment[1] - segment[0]).normalized();
+    float denom = triangle_normal.dot(ray_direction);
+    float t = (triangle.verts[0] - segment[0]).dot(triangle_normal) / denom;
+    Vec3 intersection_point = t * ray_direction + segment[0];
+
+    if (barycentric_info.is_inside_triangle(intersection_point)) {
+      return {{intersection_point, {}}, 1};
+    }
+
+    return {{}, 0};
   }
 };
