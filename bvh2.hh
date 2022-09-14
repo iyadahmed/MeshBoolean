@@ -267,7 +267,7 @@ private:
       return false;
     }
 
-    Barycentric_Info binfo(triangle);
+    Barycentric_Info barycentric_info(triangle);
 
     if ((sign1 == 0) && (sign2 == 0)) {
       // Coplanar case
@@ -291,7 +291,7 @@ private:
     float t = (triangle[0] - segment[0]).dot(triangle_normal) / denom;
     Vec3 intersection_point = t * ray_direction + segment[0];
 
-    if (binfo.is_inside_triangle(intersection_point)) {
+    if (barycentric_info.is_inside_triangle(intersection_point)) {
       //      return {{intersection_point, {}}, 1};
       return true;
     }
