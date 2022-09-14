@@ -4,6 +4,8 @@
 #include "meshio.hh"
 #include "timers.hh"
 
+#include <valgrind/callgrind.h>
+
 using namespace meshio::stl;
 
 int main(int argc, const char *argv[]) {
@@ -25,7 +27,13 @@ int main(int argc, const char *argv[]) {
   std::cout << "Number of triangles = " << bvh.triangles.size() << std::endl;
 
   Timer timer;
+  
+  CALLGRIND_START_INSTRUMENTATION;
+  CALLGRIND_TOGGLE_COLLECT;
   bvh.update_tree();
+  CALLGRIND_TOGGLE_COLLECT;
+  CALLGRIND_STOP_INSTRUMENTATION;
+
   timer.tock("Building BVH");
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes(0)
             << std::endl;
