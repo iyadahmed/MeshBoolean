@@ -105,8 +105,7 @@ public:
   size_t number_of_intersected_triangles(const Segment &segment,
                                          size_t node_index = 0) {
     Node &node = nodes_[node_index];
-    if (!do_segment_intersect_aabb(segment[0], segment[1], node.bbmin,
-                                   node.bbmax))
+    if (!do_segment_intersect_aabb(segment, node.bbmin, node.bbmax))
       return 0;
     if (node.is_leaf()) {
       size_t n = 0;
@@ -221,8 +220,12 @@ private:
 
   // From
   // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
-  bool do_segment_intersect_aabb(const Vec3 &p1, const Vec3 &p2,
-                                 const Vec3 &min, const Vec3 &max) {
+  bool do_segment_intersect_aabb(const Segment &segment, const Vec3 &min,
+                                 const Vec3 &max) {
+
+    const Vec3 &p1 = segment[0];
+    const Vec3 &p2 = segment[1];
+
     constexpr float EPSILON = std::numeric_limits<float>::epsilon() * 100;
     Vec3 d = (p2 - p1) * 0.5f;
     Vec3 e = (max - min) * 0.5f;
