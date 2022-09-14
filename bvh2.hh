@@ -60,15 +60,13 @@ public:
   };
 
 private:
-  size_t num_used_nodes_;
+  size_t num_used_nodes_ = 0;
   std::vector<Node> nodes_;
 
 public:
   std::vector<Triangle> triangles;
 
 public:
-  BVH2() { num_used_nodes_ = 0; }
-
   void update_tree() {
     nodes_.resize(2 * triangles.size());
     size_t root_node_index = get_new_node_index();
