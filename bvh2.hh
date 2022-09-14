@@ -12,8 +12,12 @@
 class BVH2 {
 
 public:
+  struct AABB {
+    Vec3 max, min;
+  };
+
   struct Node {
-    Vec3 bbmax, bbmin;
+    AABB bounding_box;
     size_t left_child_index, right_child_index;
     size_t first_primitive_index, last_primitive_index;
 
@@ -105,7 +109,7 @@ public:
   size_t number_of_intersected_triangles(const Segment &segment,
                                          size_t node_index = 0) {
     Node &node = nodes_[node_index];
-    if (!do_segment_intersect_aabb(segment, node.bbmin, node.bbmax))
+    if (!do_segment_intersect_aabb(segment, node.bounding_box))
       return 0;
     if (node.is_leaf()) {
       size_t n = 0;
@@ -144,14 +148,14 @@ private:
 
   void update_node_bounds(size_t node_index) {
     Node &node = nodes_[node_index];
-    node.bbmin = std::numeric_limits<float>::infinity();
-    node.bbmax = -1 * node.bbmin;
+    node.bounding_box.min = std::numeric_limits<float>::infinity();
+    node.bounding_box.max = -1 * node.bounding_box.min;
     for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
          i++) {
       for (Vec3 const &v : triangles[i]) {
         tassert(std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z));
-        node.bbmin.min(v);
-        node.bbmax.max(v);
+        node.bounding_box.min.min(v);
+        node.bounding_box.max.max(v);
       }
     }
   }
@@ -167,7 +171,7 @@ private:
       return;
     }
 
-    Vec3 extent = parent_node.bbmax - parent_node.bbmin;
+    Vec3 extent = parent_node.bounding_box.max - parent_node.bounding_box.min;
     size_t split_axis = 0;
     if (extent[1] > extent[0]) {
       split_axis = 1;
@@ -176,7 +180,8 @@ private:
       split_axis = 2;
     }
 
-    float split_pos = parent_node.bbmin[split_axis] + extent[split_axis] / 2;
+    float split_pos =
+        parent_node.bounding_box.min[split_axis] + extent[split_axis] / 2;
 
     // In-place partition
     size_t partition_start = parent_node.first_primitive_index;
@@ -220,16 +225,15 @@ private:
 
   // From
   // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
-  bool do_segment_intersect_aabb(const Segment &segment, const Vec3 &min,
-                                 const Vec3 &max) {
+  bool do_segment_intersect_aabb(const Segment &segment, const AABB &aabb) {
 
     const Vec3 &p1 = segment[0];
     const Vec3 &p2 = segment[1];
 
     constexpr float EPSILON = std::numeric_limits<float>::epsilon() * 100;
     Vec3 d = (p2 - p1) * 0.5f;
-    Vec3 e = (max - min) * 0.5f;
-    Vec3 c = p1 + d - (min + max) * 0.5f;
+    Vec3 e = (aabb.max - aabb.min) * 0.5f;
+    Vec3 c = p1 + d - (aabb.min + aabb.max) * 0.5f;
     Vec3 ad = d.absolute();
     if (std::abs(c[0]) > e[0] + ad[0])
       return false;
