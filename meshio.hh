@@ -64,9 +64,7 @@ public:
 
   ~BinaryFileReader() { fclose(file); }
 
-  size_t get_reported_number_of_triangles() const {
-    return number_of_triangles;
-  }
+  size_t get_reported_number_of_triangles() const { return number_of_triangles; }
 
   BinaryTriangle read_next_triangle() {
     BinaryTriangle output;
@@ -82,12 +80,10 @@ public:
   }
 };
 
-std::vector<std::pair<size_t, Vec3>>
-read_binary_stl_index_vertex_pairs_unchecked(const char *filename) {
+std::vector<std::pair<size_t, Vec3>> read_binary_stl_index_vertex_pairs_unchecked(const char *filename) {
   BinaryFileReader stl_file_reader(filename);
   std::vector<std::pair<size_t, Vec3>> output;
-  for (size_t i = 0; i < stl_file_reader.get_reported_number_of_triangles();
-       i++) {
+  for (size_t i = 0; i < stl_file_reader.get_reported_number_of_triangles(); i++) {
     auto t = stl_file_reader.read_next_triangle();
     for (size_t j = 0; j < 3; j++) {
       const auto &vert = t.vertices[j];

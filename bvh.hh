@@ -7,15 +7,12 @@
 
 #include "common.hh"
 #include "non_copyable.hh"
-//#include "vec3.hh"
 
-inline bool all_greater_than(const Vec3 &a, const Vec3 &b) {
-  return (a.x > b.x) && (a.y > b.y) && (a.z > b.z);
-}
+// #include "vec3.hh"
 
-inline bool all_less_than(const Vec3 &a, const Vec3 &b) {
-  return (a.x < b.x) && (a.y < b.y) && (a.z < b.z);
-}
+inline bool all_greater_than(const Vec3 &a, const Vec3 &b) { return (a.x > b.x) && (a.y > b.y) && (a.z > b.z); }
+
+inline bool all_less_than(const Vec3 &a, const Vec3 &b) { return (a.x < b.x) && (a.y < b.y) && (a.z < b.z); }
 
 int signof(const float &value, const float &&epsilon) {
   if (value > epsilon) {
@@ -43,9 +40,7 @@ public:
     std::array<Vec3, 3> points;
     Vec3 centroid_cached;
 
-    Vec3 calc_normal() const {
-      return (points[1] - points[0]).cross(points[2] - points[0]).normalized();
-    }
+    Vec3 calc_normal() const { return (points[1] - points[0]).cross(points[2] - points[0]).normalized(); }
   };
 
   struct Barycentric_Info {
@@ -90,8 +85,7 @@ public:
       return bbox;
     }
 
-    Segment_Triangle_Intersection_Result
-    intersect_triangle(const Triangle &triangle) const {
+    Segment_Triangle_Intersection_Result intersect_triangle(const Triangle &triangle) const {
       Vec3 s1 = verts[0] - triangle.points[0];
       Vec3 s2 = verts[1] - triangle.points[0];
       Vec3 triangle_normal = triangle.calc_normal();
@@ -149,13 +143,11 @@ public:
     size_t triangles_count() const { return std::distance(start, end); }
 
     bool does_overlap(const Node &other) const {
-      return all_greater_than(bbox.max, other.bbox.min) &&
-             all_less_than(bbox.min, other.bbox.max);
+      return all_greater_than(bbox.max, other.bbox.min) && all_less_than(bbox.min, other.bbox.max);
     }
 
     bool does_overlap(const BBox &other_bbox) const {
-      return all_greater_than(bbox.max, other_bbox.min) &&
-             all_less_than(bbox.max, other_bbox.max);
+      return all_greater_than(bbox.max, other_bbox.min) && all_less_than(bbox.max, other_bbox.max);
     }
   };
 
@@ -194,9 +186,8 @@ private:
     }
     float split_pos = root->bbox.min[split_axis] + dims[split_axis] * .5f;
 
-    auto it = std::partition(root->start, root->end, [=](const Triangle &t) {
-      return t.centroid_cached[split_axis] < split_pos;
-    });
+    auto it = std::partition(root->start, root->end,
+                             [=](const Triangle &t) { return t.centroid_cached[split_axis] < split_pos; });
 
     if ((it == root->start) || (it == root->end)) {
       // abort split
@@ -226,8 +217,7 @@ private:
     if (root == nullptr) {
       return 0;
     }
-    return 1 + calc_number_of_nodes_(root->left) +
-           calc_number_of_nodes_(root->right);
+    return 1 + calc_number_of_nodes_(root->left) + calc_number_of_nodes_(root->right);
   };
 
   void self_intersection_core(const Segment &segment, const Node *node) {
@@ -239,8 +229,7 @@ private:
     }
     if (node->is_leaf()) {
       for (auto tri_iter = node->start; tri_iter < node->end; tri_iter++) {
-        self_intersection_segment_triangle_intersection_handler(
-            segment.intersect_triangle(*tri_iter), tri_iter);
+        self_intersection_segment_triangle_intersection_handler(segment.intersect_triangle(*tri_iter), tri_iter);
       }
     }
     self_intersection_core(segment, node->left);
@@ -255,9 +244,8 @@ private:
 
   std::vector<Intersection_Point_Polar> self_intersection_points;
 
-  void self_intersection_segment_triangle_intersection_handler(
-      Segment_Triangle_Intersection_Result const &intersection,
-      std::vector<Triangle>::iterator tri_iter) {
+  void self_intersection_segment_triangle_intersection_handler(Segment_Triangle_Intersection_Result const &intersection,
+                                                               std::vector<Triangle>::iterator tri_iter) {
     for (size_t i = 0; i < intersection.points_num; i++) {
       Vec3 p3d = intersection.points[i] - tri_iter->points[0];
       Vec3 basis1 = tri_iter->points[1] - tri_iter->points[0];
@@ -320,8 +308,7 @@ void intersect_ray_tri(BVH::Ray &ray, const BVH::Triangle &tri) {
   }
 }
 
-bool intersect_ray_aabb(const BVH::Ray &ray, const Vec3 &bmin,
-                        const Vec3 &bmax) {
+bool intersect_ray_aabb(const BVH::Ray &ray, const Vec3 &bmin, const Vec3 &bmax) {
   float tx1 = (bmin.x - ray.origin.x) / ray.direction.x;
   float tx2 = (bmax.x - ray.origin.x) / ray.direction.x;
   float tmin = std::min(tx1, tx2);

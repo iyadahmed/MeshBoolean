@@ -40,8 +40,7 @@ int main(int argc, const char *argv[]) {
   BVH2::Segment s;
   s[0] = {0, 0, 2};
   s[1] = {0, 0, 1};
-  std::cout << "Number of triangles intersecting segment "
-            << bvh.number_of_intersected_triangles(s) << std::endl;
+  std::cout << "Number of triangles intersecting segment " << bvh.number_of_intersected_triangles(s) << std::endl;
 
   // TODO: intersect all mesh edges with the mesh itself using the BVH and
   // collect intersection points

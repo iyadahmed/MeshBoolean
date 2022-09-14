@@ -11,8 +11,8 @@
 #ifdef NDEBUG
 #define tassert(x)
 #else
-#define tassert(x)                                                             \
-  if (!(x)) {                                                                  \
-    throw;                                                                     \
+#define tassert(x)                                                                                                     \
+  if (!(x)) {                                                                                                          \
+    throw;                                                                                                             \
   }
 #endif

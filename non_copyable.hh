@@ -5,7 +5,7 @@
  * A type that inherits from NonCopyable cannot be copied anymore.
  */
 class NonCopyable {
- public:
+public:
   /* Disable copy construction and assignment. */
   NonCopyable(const NonCopyable &other) = delete;
   NonCopyable &operator=(const NonCopyable &other) = delete;

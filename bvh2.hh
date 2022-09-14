@@ -28,10 +28,7 @@ public:
       first_primitive_index = last_primitive_index = INVALID_INDEX;
     }
 
-    bool is_leaf() const {
-      return left_child_index == INVALID_INDEX &&
-             right_child_index == INVALID_INDEX;
-    }
+    bool is_leaf() const { return left_child_index == INVALID_INDEX && right_child_index == INVALID_INDEX; }
   };
 
   class Triangle {
@@ -42,9 +39,7 @@ public:
 
     Vec3 calc_centroid() const { return (verts[0] + verts[1] + verts[2]) / 3; }
 
-    Vec3 calc_normal() const {
-      return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized();
-    }
+    Vec3 calc_normal() const { return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized(); }
 
     AABB calc_bounding_box() const {
 #ifndef NDEBUG
@@ -122,8 +117,7 @@ public:
     if (node.is_leaf()) {
       return 1;
     }
-    return count_leaf_nodes(node.left_child_index) +
-           count_leaf_nodes(node.right_child_index);
+    return count_leaf_nodes(node.left_child_index) + count_leaf_nodes(node.right_child_index);
   }
 
   size_t cound_leaf_triangles(size_t node_index = 0) const {
@@ -134,19 +128,16 @@ public:
     if (node.is_leaf()) {
       return node.last_primitive_index - node.first_primitive_index + 1;
     }
-    return cound_leaf_triangles(node.left_child_index) +
-           cound_leaf_triangles(node.right_child_index);
+    return cound_leaf_triangles(node.left_child_index) + cound_leaf_triangles(node.right_child_index);
   }
 
-  size_t number_of_intersected_triangles(const Segment &segment,
-                                         size_t node_index = 0) {
+  size_t number_of_intersected_triangles(const Segment &segment, size_t node_index = 0) {
     Node &node = nodes_[node_index];
     if (!do_segment_intersect_aabb(segment, node.bounding_box))
       return 0;
     if (node.is_leaf()) {
       size_t n = 0;
-      for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
-           i++) {
+      for (size_t i = node.first_primitive_index; i < node.last_primitive_index; i++) {
         n += do_segment_intersect_triangle(segment, triangles[i]);
       }
       return n;
@@ -161,18 +152,14 @@ public:
     float c1, c2;
   };
 
-  void intersect(const Segment &segment,
-                 std::vector<Intersection_Point> &output,
-                 size_t node_index = 0) {
+  void intersect(const Segment &segment, std::vector<Intersection_Point> &output, size_t node_index = 0) {
     Node &node = nodes_[node_index];
     if (!do_segment_intersect_aabb(segment, node.bounding_box))
       return;
     if (node.is_leaf()) {
-      for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
-           i++) {
+      for (size_t i = node.first_primitive_index; i < node.last_primitive_index; i++) {
         const Triangle &t = triangles[i];
-        auto intersection_result =
-            intersect_segment_triangle(segment, t);
+        auto intersection_result = intersect_segment_triangle(segment, t);
         for (size_t pi = 0; pi < intersection_result.num_points; pi++) {
           const Vec3 &v = intersection_result.points[pi];
           Vec3 b1 = t.verts[1] - t.verts[0];
@@ -209,8 +196,7 @@ private:
     Node &node = nodes_[node_index];
     node.bounding_box.min = std::numeric_limits<float>::infinity();
     node.bounding_box.max = -1 * node.bounding_box.min;
-    for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
-         i++) {
+    for (size_t i = node.first_primitive_index; i < node.last_primitive_index; i++) {
       const AABB &bb = triangles[i].cached_bounding_box;
       node.bounding_box.min.min(bb.min);
       node.bounding_box.max.max(bb.max);
@@ -221,8 +207,7 @@ private:
 
     Node &parent_node = nodes_[parent_node_index];
 
-    tassert(parent_node.first_primitive_index <=
-            parent_node.last_primitive_index);
+    tassert(parent_node.first_primitive_index <= parent_node.last_primitive_index);
 
     if (parent_node.first_primitive_index == parent_node.last_primitive_index) {
       return;
@@ -237,8 +222,7 @@ private:
       split_axis = 2;
     }
 
-    float split_pos =
-        parent_node.bounding_box.min[split_axis] + extent[split_axis] / 2;
+    float split_pos = parent_node.bounding_box.min[split_axis] + extent[split_axis] / 2;
 
     // In-place partition
     size_t partition_start = parent_node.first_primitive_index;
@@ -254,8 +238,7 @@ private:
       }
     }
 
-    if (partition_start == parent_node.first_primitive_index ||
-        partition_end == parent_node.last_primitive_index) {
+    if (partition_start == parent_node.first_primitive_index || partition_end == parent_node.last_primitive_index) {
       return;
     }
 
@@ -283,8 +266,7 @@ private:
 
   // From
   // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
-  static bool do_segment_intersect_aabb(const Segment &segment,
-                                        const AABB &aabb) {
+  static bool do_segment_intersect_aabb(const Segment &segment, const AABB &aabb) {
 
     const Vec3 &p1 = segment[0];
     const Vec3 &p2 = segment[1];
@@ -300,20 +282,16 @@ private:
       return false;
     if (std::abs(c[2]) > e[2] + ad[2])
       return false;
-    if (std::abs(d[1] * c[2] - d[2] * c[1]) >
-        e[1] * ad[2] + e[2] * ad[1] + EPSILON)
+    if (std::abs(d[1] * c[2] - d[2] * c[1]) > e[1] * ad[2] + e[2] * ad[1] + EPSILON)
       return false;
-    if (std::abs(d[2] * c[0] - d[0] * c[2]) >
-        e[2] * ad[0] + e[0] * ad[2] + EPSILON)
+    if (std::abs(d[2] * c[0] - d[0] * c[2]) > e[2] * ad[0] + e[0] * ad[2] + EPSILON)
       return false;
-    if (std::abs(d[0] * c[1] - d[1] * c[0]) >
-        e[0] * ad[1] + e[1] * ad[0] + EPSILON)
+    if (std::abs(d[0] * c[1] - d[1] * c[0]) > e[0] * ad[1] + e[1] * ad[0] + EPSILON)
       return false;
     return true;
   }
 
-  static bool do_segment_intersect_triangle(const Segment &segment,
-                                            const Triangle &triangle) {
+  static bool do_segment_intersect_triangle(const Segment &segment, const Triangle &triangle) {
     Vec3 s1 = segment[0] - triangle.verts[0];
     Vec3 s2 = segment[1] - triangle.verts[0];
     Vec3 triangle_normal = triangle.calc_normal();
@@ -363,8 +341,8 @@ private:
     size_t num_points = 0;
   };
 
-  static Segment_Triangle_Intersection_Result
-  intersect_segment_triangle(const Segment &segment, const Triangle &triangle) {
+  static Segment_Triangle_Intersection_Result intersect_segment_triangle(const Segment &segment,
+                                                                         const Triangle &triangle) {
     Vec3 s1 = segment[0] - triangle.verts[0];
     Vec3 s2 = segment[1] - triangle.verts[0];
     Vec3 triangle_normal = triangle.calc_normal();

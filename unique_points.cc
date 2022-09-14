@@ -43,15 +43,13 @@ int main(int argc, const char *argv[]) {
 
   for (size_t i = 1; i < verts.size(); i++) {
     if (distance(verts[i].second, verts[i - 1].second) < 0.0000001f) {
-      unique_vertex_indices_map[verts[i].first] =
-          unique_vertex_indices_map[verts[i - 1].first];
+      unique_vertex_indices_map[verts[i].first] = unique_vertex_indices_map[verts[i - 1].first];
     } else {
       unique_verts_num++;
     }
   }
 
-  std::cout << "Number of non-unique vertices = " << unique_verts_num
-            << std::endl;
+  std::cout << "Number of non-unique vertices = " << unique_verts_num << std::endl;
 
   return 0;
 }
