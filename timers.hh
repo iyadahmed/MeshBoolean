@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-// Initially-not-but-later insipired-by/largely taken from Blender
+// Initially-not-but-later inspired-by/largely taken from Blender
 
 using Clock = std::chrono::high_resolution_clock;
 using Timepoint = Clock::time_point;
