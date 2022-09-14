@@ -247,7 +247,8 @@ private:
 
   // From
   // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
-  bool do_segment_intersect_aabb(const Segment &segment, const AABB &aabb) {
+  static bool do_segment_intersect_aabb(const Segment &segment,
+                                        const AABB &aabb) {
 
     const Vec3 &p1 = segment[0];
     const Vec3 &p2 = segment[1];
