@@ -34,7 +34,31 @@ public:
     }
   };
 
-  using Triangle = std::array<Vec3, 3>;
+  class Triangle {
+  public:
+    std::array<Vec3, 3> verts;
+    Vec3 cached_centroid;
+    AABB cached_bounding_box;
+
+    Vec3 calc_centroid() const { return (verts[0] + verts[1] + verts[2]) / 3; }
+
+    Vec3 calc_normal() const {
+      return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized();
+    }
+
+    AABB calc_bounding_box() const {
+#ifndef NDEBUG
+      for (const auto &v : verts) {
+        tassert(std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z));
+      }
+#endif
+      AABB out;
+      out.min = Vec3::min(verts[0], Vec3::min(verts[1], verts[2]));
+      out.max = Vec3::max(verts[0], Vec3::max(verts[1], verts[2]));
+      return out;
+    }
+  };
+
   using Segment = std::array<Vec3, 2>;
 
   struct Barycentric_Info {
@@ -44,9 +68,9 @@ public:
     float dot00, dot01, dot11, inv_denom;
 
     explicit Barycentric_Info(const Triangle &triangle) {
-      triangle_v0 = triangle[0];
-      v0 = triangle[2] - triangle[0];
-      v1 = triangle[1] - triangle[0];
+      triangle_v0 = triangle.verts[0];
+      v0 = triangle.verts[2] - triangle.verts[0];
+      v1 = triangle.verts[1] - triangle.verts[0];
       dot00 = dot(v0, v0);
       dot01 = dot(v0, v1);
       dot11 = dot(v1, v1);
@@ -73,6 +97,12 @@ public:
 public:
   void update_tree() {
     nodes_.resize(2 * triangles.size());
+
+    for (auto &t : triangles) {
+      t.cached_centroid = t.calc_centroid();
+      t.cached_bounding_box = t.calc_bounding_box();
+    }
+
     size_t root_node_index = get_new_node_index();
     Node &root_node = nodes_[root_node_index];
     root_node.first_primitive_index = 0;
@@ -125,12 +155,6 @@ public:
   }
 
 private:
-  static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
-
-  static Vec3 calc_normal(const Triangle &t) {
-    return (t[1] - t[0]).cross(t[2] - t[0]).normalized();
-  }
-
   static int signof(const float &value, const float &&epsilon) {
     if (value > epsilon) {
       return 1;
@@ -152,11 +176,9 @@ private:
     node.bounding_box.max = -1 * node.bounding_box.min;
     for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
          i++) {
-      for (Vec3 const &v : triangles[i]) {
-        tassert(std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z));
-        node.bounding_box.min.min(v);
-        node.bounding_box.max.max(v);
-      }
+      const AABB &bb = triangles[i].cached_bounding_box;
+      node.bounding_box.min.min(bb.min);
+      node.bounding_box.max.max(bb.max);
     }
   }
 
@@ -187,7 +209,7 @@ private:
     size_t partition_start = parent_node.first_primitive_index;
     size_t partition_end = parent_node.last_primitive_index;
     while (partition_start < partition_end) {
-      if (centroid(triangles[partition_start])[split_axis] < split_pos) {
+      if (triangles[partition_start].cached_centroid[split_axis] < split_pos) {
         partition_start++;
       } else {
         tassert(partition_end != 0);
@@ -255,9 +277,9 @@ private:
 
   static bool do_segment_intersect_triangle(const Segment &segment,
                                             const Triangle &triangle) {
-    Vec3 s1 = segment[0] - triangle[0];
-    Vec3 s2 = segment[1] - triangle[0];
-    Vec3 triangle_normal = calc_normal(triangle);
+    Vec3 s1 = segment[0] - triangle.verts[0];
+    Vec3 s2 = segment[1] - triangle.verts[0];
+    Vec3 triangle_normal = triangle.calc_normal();
 
     float d1 = std::abs(triangle_normal.dot(s1));
     float d2 = std::abs(triangle_normal.dot(s2));
@@ -293,7 +315,7 @@ private:
     // https://stackoverflow.com/a/23976134/8094047
     Vec3 ray_direction = (segment[1] - segment[0]).normalized();
     float denom = triangle_normal.dot(ray_direction);
-    float t = (triangle[0] - segment[0]).dot(triangle_normal) / denom;
+    float t = (triangle.verts[0] - segment[0]).dot(triangle_normal) / denom;
     Vec3 intersection_point = t * ray_direction + segment[0];
 
     if (barycentric_info.is_inside_triangle(intersection_point)) {
