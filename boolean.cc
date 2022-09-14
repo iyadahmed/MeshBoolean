@@ -27,7 +27,7 @@ int main(int argc, const char *argv[]) {
   std::cout << "Number of triangles = " << bvh.triangles.size() << std::endl;
 
   Timer timer;
-  
+
   CALLGRIND_START_INSTRUMENTATION;
   CALLGRIND_TOGGLE_COLLECT;
   bvh.update_tree();
@@ -41,8 +41,8 @@ int main(int argc, const char *argv[]) {
   BVH2::Segment s;
   s[0] = {0, 0, 2};
   s[1] = {0, 0, 1};
-  std::cout << "Number of leaf node intersecting segment "
-            << bvh.intersect_segment(s) << std::endl;
+  std::cout << "Number of triangles intersecting segment "
+            << bvh.number_of_intersected_triangles(s) << std::endl;
 
   // TODO: intersect all mesh edges with the mesh itself using the BVH and
   // collect intersection points

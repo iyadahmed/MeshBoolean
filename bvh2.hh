@@ -33,6 +33,32 @@ public:
   using Triangle = std::array<Vec3, 3>;
   using Segment = std::array<Vec3, 2>;
 
+  struct Barycentric_Info {
+    // https://blackpawn.com/texts/pointinpoly/
+    Vec3 triangle_v0;
+    Vec3 v0, v1;
+    float dot00, dot01, dot11, inv_denom;
+
+    explicit Barycentric_Info(const Triangle &triangle) {
+      triangle_v0 = triangle[0];
+      v0 = triangle[2] - triangle[0];
+      v1 = triangle[1] - triangle[0];
+      dot00 = dot(v0, v0);
+      dot01 = dot(v0, v1);
+      dot11 = dot(v1, v1);
+      inv_denom = 1 / (dot00 * dot11 - dot01 * dot01);
+    }
+
+    bool is_inside_triangle(Vec3 const &point) const {
+      Vec3 v2 = point - triangle_v0;
+      float dot02 = dot(v0, v2);
+      float dot12 = dot(v1, v2);
+      float u = (dot11 * dot02 - dot01 * dot12) * inv_denom;
+      float v = (dot00 * dot12 - dot01 * dot02) * inv_denom;
+      return (u >= 0) && (v >= 0) && (u + v < 1);
+    }
+  };
+
 private:
   size_t num_used_nodes_;
   std::vector<Node> nodes_;
@@ -78,21 +104,41 @@ public:
            cound_leaf_triangles(node.right_child_index);
   }
 
-  size_t intersect_segment(const Segment &segment, size_t node_index = 0) {
+  size_t number_of_intersected_triangles(const Segment &segment,
+                                         size_t node_index = 0) {
     Node &node = nodes_[node_index];
     if (!do_segment_intersect_aabb(segment[0], segment[1], node.bbmin,
                                    node.bbmax))
       return 0;
     if (node.is_leaf()) {
-      return 1;
+      size_t n = 0;
+      for (size_t i = node.first_primitive_index; i < node.last_primitive_index;
+           i++) {
+        n += do_segment_intersect_triangle(segment, triangles[i]);
+      }
+      return n;
     } else {
-      return intersect_segment(segment, node.left_child_index) +
-             intersect_segment(segment, node.right_child_index);
+      return number_of_intersected_triangles(segment, node.left_child_index) +
+             number_of_intersected_triangles(segment, node.right_child_index);
     }
   }
 
 private:
   static Vec3 centroid(const Triangle &t) { return (t[0] + t[1] + t[2]) / 3; }
+
+  static Vec3 calc_normal(const Triangle &t) {
+    return (t[1] - t[0]).cross(t[2] - t[0]).normalized();
+  }
+
+  static int signof(const float &value, const float &&epsilon) {
+    if (value > epsilon) {
+      return 1;
+    }
+    if (value < epsilon) {
+      return -1;
+    }
+    return 0;
+  }
 
   size_t get_new_node_index() {
     tassert(num_used_nodes_ < nodes_.size());
@@ -200,5 +246,57 @@ private:
         e[0] * ad[1] + e[1] * ad[0] + EPSILON)
       return false;
     return true;
+  }
+
+  static bool do_segment_intersect_triangle(const Segment &segment,
+                                            const Triangle &triangle) {
+    Vec3 s1 = segment[0] - triangle[0];
+    Vec3 s2 = segment[1] - triangle[0];
+    Vec3 triangle_normal = calc_normal(triangle);
+
+    float d1 = std::abs(triangle_normal.dot(s1));
+    float d2 = std::abs(triangle_normal.dot(s2));
+
+    int sign1 = signof(d1, 0.0001f);
+    int sign2 = signof(d2, 0.0001f);
+
+    if ((sign1 == sign2) && (sign1 != 0)) {
+      // Both segment points are on the same side of the triangle supporting
+      // plane, no intersection is possible
+      //      return {{}, 0};
+      return false;
+    }
+
+    Barycentric_Info binfo(triangle);
+
+    if ((sign1 == 0) && (sign2 == 0)) {
+      // Coplanar case
+      /* TODO:
+      1. if any point of the two segment points are inside triangle, include
+      it in the intersection result
+      2. if both points are inside triangle return that result
+      3. if not, intersect segment with all triangle segments
+      4. note there might be no intersections, if the segment doesn't
+      intersect any of triangle segments, nor does it have any point inside
+      triangle
+      */
+      return false;
+    }
+
+    // Non-coplanar case
+    // Intersect segment supporting ray with triangle supporting plane
+    // https://stackoverflow.com/a/23976134/8094047
+    Vec3 ray_direction = (segment[1] - segment[0]).normalized();
+    float denom = triangle_normal.dot(ray_direction);
+    float t = (triangle[0] - segment[0]).dot(triangle_normal) / denom;
+    Vec3 intersection_point = t * ray_direction + segment[0];
+
+    if (binfo.is_inside_triangle(intersection_point)) {
+      //      return {{intersection_point, {}}, 1};
+      return true;
+    }
+
+    //    return {{}, 0};
+    return false;
   }
 };
