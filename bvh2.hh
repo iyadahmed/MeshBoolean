@@ -284,8 +284,8 @@ private:
     Vec3 s2 = segment[1] - triangle.verts[0];
     Vec3 triangle_normal = triangle.calc_normal();
 
-    float d1 = std::abs(triangle_normal.dot(s1));
-    float d2 = std::abs(triangle_normal.dot(s2));
+    float d1 = triangle_normal.dot(s1);
+    float d2 = triangle_normal.dot(s2);
 
     int sign1 = signof(d1, 0.0001f);
     int sign2 = signof(d2, 0.0001f);
