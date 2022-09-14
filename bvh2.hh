@@ -111,6 +111,7 @@ public:
     update_node_bounds(root_node_index);
     subdivide(root_node_index);
     tassert(cound_leaf_triangles(0) == triangles.size());
+    tassert(nodes_.size() <= (2 * triangles.size()));
   }
 
   size_t count_leaf_nodes(size_t node_index = 0) const {
@@ -167,7 +168,6 @@ private:
   }
 
   size_t get_new_node_index() {
-    tassert(num_used_nodes_ < nodes_.size());
     nodes_.emplace_back();
     return num_used_nodes_++;
   }
