@@ -7,9 +7,8 @@
 #include "common.hh"
 #include "vec3.hh"
 
-// Initial inspiration
-// https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 class BVH2 {
+  // Reference: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 
 public:
   struct AABB {
@@ -57,7 +56,7 @@ public:
   using Segment = std::array<Vec3, 2>;
 
   struct Barycentric_Info {
-    // https://blackpawn.com/texts/pointinpoly/
+    // Reference: https://blackpawn.com/texts/pointinpoly/
     Vec3 triangle_v0;
     Vec3 v0, v1;
     float dot00, dot01, dot11, inv_denom;
@@ -264,9 +263,8 @@ private:
     subdivide(parent_node.right_child_index);
   }
 
-  // From
-  // https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
   static bool do_segment_intersect_aabb(const Segment &segment, const AABB &aabb) {
+    // Reference: https://gamedev.net/forums/topic/338987-aabb-line-segment-intersection-test/3209917/
 
     const Vec3 &p1 = segment[0];
     const Vec3 &p2 = segment[1];
@@ -327,7 +325,7 @@ private:
 
     // Non-coplanar case
     // Intersect segment supporting ray with triangle supporting plane
-    // https://stackoverflow.com/a/23976134/8094047
+    // Reference: https://stackoverflow.com/a/23976134/8094047
     Vec3 ray_direction = (segment[1] - segment[0]).normalized();
     float denom = triangle_normal.dot(ray_direction);
     float t = (triangle.verts[0] - segment[0]).dot(triangle_normal) / denom;
@@ -377,7 +375,7 @@ private:
 
     // Non-coplanar case
     // Intersect segment supporting ray with triangle supporting plane
-    // https://stackoverflow.com/a/23976134/8094047
+    // Reference: https://stackoverflow.com/a/23976134/8094047
     Vec3 ray_direction = (segment[1] - segment[0]).normalized();
     float denom = triangle_normal.dot(ray_direction);
     float t = (triangle.verts[0] - segment[0]).dot(triangle_normal) / denom;
