@@ -44,7 +44,7 @@ struct Vec3 {
 
   static Vec3 min(const Vec3 &a, const Vec3 &b) {
     Vec3 out;
-    max(out, a, b);
+    min(out, a, b);
     return out;
   }
 
