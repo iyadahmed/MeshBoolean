@@ -89,6 +89,7 @@ public:
 
 private:
   size_t num_used_nodes_ = 0;
+  // TODO: Idea exponentially expanding vector with max grow size
   std::vector<Node> nodes_;
 
 public:
@@ -96,7 +97,7 @@ public:
 
 public:
   void update_tree() {
-    nodes_.resize(2 * triangles.size());
+    nodes_.reserve(2 * triangles.size());
 
     for (auto &t : triangles) {
       t.cached_centroid = t.calc_centroid();
@@ -167,6 +168,7 @@ private:
 
   size_t get_new_node_index() {
     tassert(num_used_nodes_ < nodes_.size());
+    nodes_.emplace_back();
     return num_used_nodes_++;
   }
 
