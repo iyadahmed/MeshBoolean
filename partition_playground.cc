@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cassert>
 #include <functional>
 #include <iostream>
 #include <random>
@@ -27,12 +29,27 @@ int main() {
       i++;
     } else {
       std::swap(points[i], points[k]);
-      tassert(k != 0);
+      assert(k != 0);
       k--;
     }
   }
 
   for (auto &point : points) {
     std::cout << point << " " << std::endl;
+  }
+
+  std::vector<int> foo(10);
+  std::iota(foo.begin(), foo.end(), 0);
+  auto bar = std::partition(foo.begin(), foo.end(), [](int i) { return i < 11; });
+  assert(bar != foo.end());
+
+  std::vector<int> numbers(100000000);
+  std::iota(numbers.begin(), numbers.end(), 0);
+
+  std::vector<int> p1, p2;
+  p1.reserve(numbers.size());
+  p2.reserve(numbers.size());
+
+  for (size_t i = 0; i < numbers.size(); i++) {
   }
 }

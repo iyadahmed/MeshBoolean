@@ -6,17 +6,28 @@ project(MeshBoolean)
 add_executable(
         boolean
 
+        ball_tree2.hh
         boolean.cc
-        bvh2.hh
         common.hh
         meshio.hh
-        vec3.hh
         non_copyable.hh
-        timers.hh
-        ball_tree2.hh
         statistics.hh
-        segment_segment_intersection_2d.hh
-        bvh_point_query.hh
+        timers.hh
+        vec3.hh
+
+        BVH/aabb.hh
+        BVH/barycentric.hh
+        BVH/bvh.cc
+        BVH/bvh.hh
+        BVH/common.hh
+        BVH/node.hh
+        BVH/query_point.cc
+        BVH/query_point.hh
+        BVH/segment_aabb_intersection.hh
+        BVH/segment_bvh_intersection.hh
+        BVH/segment_segment_intersection_2d.hh
+        BVH/segment_triangle_intersection.hh
+        BVH/triangle.hh
 )
 
 target_compile_features(boolean PUBLIC cxx_std_11)
@@ -26,8 +37,8 @@ set_target_properties(boolean PROPERTIES CXX_EXTENSIONS OFF)
 add_executable(
         unique
 
-        unique_points.cc
         meshio.hh
+        unique_points.cc
         vec3.hh
 )
 target_compile_features(unique PUBLIC cxx_std_11)
