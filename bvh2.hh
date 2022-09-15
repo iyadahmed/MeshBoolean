@@ -1,11 +1,11 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cmath>  // for std::isfinite
 #include <limits> // for std::numeric_limits
 #include <vector>
 
-#include "common.hh"
 #include "vec3.hh"
 
 class BVH2 {
@@ -50,7 +50,7 @@ public:
     AABB calc_bounding_box() const {
 #ifndef NDEBUG
       for (const auto &v : verts) {
-        tassert(std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z));
+        assert(std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z));
       }
 #endif
       AABB out;
@@ -111,8 +111,8 @@ public:
     root_node.last_primitive_index = triangles.size() - 1;
     update_node_bounds(root_node_index);
     subdivide(root_node_index);
-    tassert(cound_leaf_triangles(0) == triangles.size());
-    tassert(nodes_.size() <= (2 * triangles.size()));
+    assert(cound_leaf_triangles(0) == triangles.size());
+    assert(nodes_.size() <= (2 * triangles.size()));
   }
 
   size_t count_leaf_nodes(size_t node_index = 0) const {
@@ -213,7 +213,7 @@ private:
 
     Node &parent_node = nodes_[parent_node_index];
 
-    tassert(parent_node.first_primitive_index <= parent_node.last_primitive_index);
+    assert(parent_node.first_primitive_index <= parent_node.last_primitive_index);
 
     if (parent_node.first_primitive_index == parent_node.last_primitive_index) {
       return;
@@ -237,7 +237,7 @@ private:
       if (triangles[partition_start].cached_centroid[split_axis] < split_pos) {
         partition_start++;
       } else {
-        tassert(partition_end != 0);
+        assert(partition_end != 0);
         // TODO: store triangle indices instead so that swap is faster
         std::swap(triangles[partition_start], triangles[partition_end]);
         partition_end--;
