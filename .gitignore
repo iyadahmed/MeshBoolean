@@ -1,6 +1,4 @@
-*
-!**/.clang-format
-!**/*.cc
-!**/*.hh
-!**/CMakeLists.txt
-!**/.gitignore
+cmake-build-*
+callgrind.out.*
+profile.sh
+.idea
