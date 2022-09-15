@@ -12,6 +12,7 @@ int main(int argc, const char *argv[]) {
 
   if (argc != 2) {
     puts("Usage: boolean file.stl");
+    return 1;
   }
 
   const char *filename = argv[1];
