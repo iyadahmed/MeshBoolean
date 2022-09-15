@@ -366,6 +366,16 @@ private:
     Barycentric_Info barycentric_info(triangle);
 
     if ((sign1 == 0) && (sign2 == 0)) {
+      Segment_Triangle_Intersection_Result res;
+      if (barycentric_info.is_inside_triangle(segment[0])) {
+        res.points[res.num_points++] = segment[0];
+      }
+      if (barycentric_info.is_inside_triangle(segment[1])) {
+        res.points[res.num_points++] = segment[1];
+      }
+      if (res.num_points == 2) {
+        return res;
+      }
       // Coplanar case
       /* TODO:
       1. if any point of the two segment points are inside triangle, include
