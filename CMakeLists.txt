@@ -16,7 +16,7 @@ add_executable(boolean
         statistics.hh
         )
 
-target_compile_features(boolean PUBLIC cxx_std_17)
+target_compile_features(boolean PUBLIC cxx_std_11)
 #target_link_libraries(boolean PUBLIC TBB::tbb)
 set_target_properties(boolean PROPERTIES CXX_EXTENSIONS OFF)
 
@@ -25,7 +25,7 @@ add_executable(unique
         meshio.hh
         vec3.hh
         )
-target_compile_features(unique PUBLIC cxx_std_17)
+target_compile_features(unique PUBLIC cxx_std_11)
 #target_link_libraries(unique PUBLIC TBB::tbb)
 set_target_properties(unique PROPERTIES CXX_EXTENSIONS OFF)
 

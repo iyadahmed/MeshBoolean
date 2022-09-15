@@ -1,7 +1,8 @@
 #pragma once
 
 #include <array>
-#include <cmath> // for std::isfinite
+#include <cmath>  // for std::isfinite
+#include <limits> // for std::numeric_limits
 #include <vector>
 
 #include "common.hh"
