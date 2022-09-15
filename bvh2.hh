@@ -36,7 +36,13 @@ public:
     Vec3 cached_centroid;
     AABB cached_bounding_box;
 
-    Vec3 calc_centroid() const { return (verts[0] + verts[1] + verts[2]) / 3; }
+    Vec3 calc_centroid() const {
+      return {
+          (verts[0].x + verts[1].x + verts[2].x) / 3,
+          (verts[0].y + verts[1].y + verts[2].y) / 3,
+          (verts[0].z + verts[1].z + verts[2].z) / 3,
+      };
+    }
 
     Vec3 calc_normal() const { return (verts[1] - verts[0]).cross(verts[2] - verts[0]).normalized(); }
 
