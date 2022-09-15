@@ -36,17 +36,9 @@ struct Vec3 {
     out.z = std::max(a.z, b.z);
   }
 
-  static Vec3 max(const Vec3 &a, const Vec3 &b) {
-    Vec3 out;
-    max(out, a, b);
-    return out;
-  }
+  static Vec3 max(const Vec3 &a, const Vec3 &b) { return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)}; }
 
-  static Vec3 min(const Vec3 &a, const Vec3 &b) {
-    Vec3 out;
-    min(out, a, b);
-    return out;
-  }
+  static Vec3 min(const Vec3 &a, const Vec3 &b) { return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)}; }
 
   void min(const Vec3 &other) {
     x = std::min(x, other.x);
