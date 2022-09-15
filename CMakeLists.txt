@@ -5,7 +5,6 @@ project(MeshBoolean)
 
 add_executable(boolean
         boolean.cc
-        bvh.hh
         bvh2.hh
         common.hh
         meshio.hh
