@@ -97,6 +97,7 @@ public:
   std::vector<Triangle> triangles;
 
 public:
+  friend size_t closest_triangle(const BVH2 &, const Vec3 &, float);
   void update_tree() {
     nodes_.reserve(2 * triangles.size());
 

@@ -3,7 +3,9 @@ project(MeshBoolean)
 
 #find_package(TBB REQUIRED)
 
-add_executable(boolean
+add_executable(
+        boolean
+
         boolean.cc
         bvh2.hh
         common.hh
@@ -13,7 +15,9 @@ add_executable(boolean
         timers.hh
         ball_tree2.hh
         statistics.hh
-        )
+        segment_segment_intersection_2d.hh
+        bvh_point_query.hh
+)
 
 target_compile_features(boolean PUBLIC cxx_std_11)
 #target_link_libraries(boolean PUBLIC TBB::tbb)

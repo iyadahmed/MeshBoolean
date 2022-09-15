@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "bvh2.hh"
+#include "bvh_point_query.hh"
 #include "meshio.hh"
 #include "timers.hh"
 
@@ -29,19 +30,44 @@ int main(int argc, const char *argv[]) {
 
   Timer timer;
 
+  bvh.update_tree();
+
+  timer.tock("Building BVH");
+
+  std::vector<Vec3> points;
+  //  std::vector<BVH2::Intersection_Point> points;
+
   CALLGRIND_START_INSTRUMENTATION;
   CALLGRIND_TOGGLE_COLLECT;
-  bvh.update_tree();
+
+  timer.tick();
+  for (const auto &t : bvh.triangles) {
+    //    BVH2::Segment s1{t.verts[0], t.verts[1]};
+    //    BVH2::Segment s2{t.verts[1], t.verts[2]};
+    //    BVH2::Segment s3{t.verts[2], t.verts[0]};
+    //
+    //    bvh.intersect(s1, points);
+    //    bvh.intersect(s2, points);
+    //    bvh.intersect(s3, points);
+    for (const auto &v : t.verts) {
+      size_t i = closest_triangle(bvh, v, .01);
+      if (i == INVALID_INDEX)
+        points.push_back(v);
+    }
+  }
+  timer.tock();
+
   CALLGRIND_TOGGLE_COLLECT;
   CALLGRIND_STOP_INSTRUMENTATION;
 
-  timer.tock("Building BVH");
-  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
+  std::cout << "Number of intersection points = " << points.size() << std::endl;
 
-  BVH2::Segment s;
-  s[0] = {0, 0, 2};
-  s[1] = {0, 0, 1};
-  std::cout << "Number of triangles intersecting segment " << bvh.number_of_intersected_triangles(s) << std::endl;
+  //  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
+  //
+  //  BVH2::Segment s;
+  //  s[0] = {0, 0, 2};
+  //  s[1] = {0, 0, 1};
+  //  std::cout << "Number of triangles intersecting segment " << bvh.number_of_intersected_triangles(s) << std::endl;
 
   // TODO: intersect all mesh edges with the mesh itself using the BVH and
   // collect intersection points
