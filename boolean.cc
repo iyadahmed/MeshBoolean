@@ -36,10 +36,14 @@ int main(int argc, const char *argv[]) {
 
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
 
+  BVH::LeafInfo biggest_leaf = bvh.find_biggest_leaf();
+  std::cout << "Largest leaf = " << biggest_leaf.num_tris << " triangles"
+            << std::endl;
+
   {
     meshio::stl::BinaryFileWriter binary_stl("out.stl");
 
-    const BVH::Node &node = bvh.nodes[bvh.find_biggest_leaf().index];
+    const BVH::Node &node = bvh.nodes[biggest_leaf.index];
     if (not node.is_leaf()) {
       throw;
     }
