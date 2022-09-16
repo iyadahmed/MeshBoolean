@@ -1,46 +1,34 @@
 #include "query_point.hh"
 
-static bool contains_point(const BVH::AABB &aabb, const Vec3 &point,
-                           float margin) {
-  return (point.x > aabb.min.x - margin) && (point.y > aabb.min.y - margin) &&
-         (point.z > aabb.min.z - margin) && (point.x < aabb.max.x + margin) &&
-         (point.y < aabb.max.y + margin) && (point.z < aabb.max.z + margin);
+static bool contains_point(const BVH::AABB &aabb, const Vec3 &point) {
+  return (point.x >= aabb.min.x) && (point.y >= aabb.min.y) &&
+         (point.z >= aabb.min.z) && (point.x <= aabb.max.x) &&
+         (point.y <= aabb.max.y) && (point.z <= aabb.max.z);
 }
 
 namespace BVH {
-size_t closest_triangle(const BVH &bvh, const Vec3 &point, float max_distance) {
-  if (bvh.nodes.empty()) {
-    throw std::runtime_error("Empty BVH");
+
+bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index) {
+  const Node &node = bvh.nodes[node_index];
+  if (not contains_point(node.bounding_box, point)) {
+    return false;
   }
-  std::stack<size_t> nodes_stack;
-  nodes_stack.push(0);
 
-  // Find closest leaf node
-  while (not nodes_stack.empty()) {
-    size_t node_index = nodes_stack.top();
-    nodes_stack.pop();
-    const Node &node = bvh.nodes[node_index];
-    if (not contains_point(node.bounding_box, point, max_distance)) {
-      continue;
-    }
-
-    if (not node.is_leaf()) {
-      nodes_stack.push(node.right_child_index);
-      nodes_stack.push(node.left_child_index);
-      continue;
-    }
-
+  if (node.is_leaf()) {
     for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
          i++) {
-      const Triangle &triangle = bvh.triangles[i];
-      Vec3 normal = triangle.calc_normal();
-      float distance = (point - triangle.verts[0]).dot(normal);
-      if (distance < max_distance) {
-        return i;
+      const Triangle &tri = bvh.triangles[i];
+      for (const auto &v : tri.verts) {
+        if (distance(v, point) < .0001f) {
+          return true;
+        }
       }
     }
-  }
 
-  return INVALID_INDEX;
+    return false;
+  } else {
+    return contains_point(bvh, point, node.right_child_index) ||
+           contains_point(bvh, point, node.left_child_index);
+  }
 }
 } // namespace BVH

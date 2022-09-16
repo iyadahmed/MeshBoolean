@@ -30,12 +30,12 @@ int main(int argc, const char *argv[]) {
   std::cout << "Number of triangles = " << bvh.triangles.size() << std::endl;
 
   Timer timer;
-
   bvh.update_tree();
-
   timer.tock("Building BVH");
 
-  std::vector<Intersection_Point> intersection_points;
+  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
+
+//  std::vector<Intersection_Point> intersection_points;
 
   CALLGRIND_START_INSTRUMENTATION;
   CALLGRIND_TOGGLE_COLLECT;
@@ -52,8 +52,9 @@ int main(int argc, const char *argv[]) {
     //    intersect(bvh, s3, intersection_points);
 
     for (const auto &v : t.verts) {
-      size_t i = closest_triangle(bvh, v, .01);
-      assert(i != BVH::INVALID_INDEX);
+      if (not BVH::contains_point(bvh, v)) {
+        puts("Failed");
+      }
     }
   }
   timer.tock();
@@ -61,9 +62,9 @@ int main(int argc, const char *argv[]) {
   CALLGRIND_TOGGLE_COLLECT;
   CALLGRIND_STOP_INSTRUMENTATION;
 
-  std::cout << "Number of intersection points = " << intersection_points.size()
-            << std::endl;
-  std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
+  //  std::cout << "Number of intersection points = " <<
+  //  intersection_points.size()
+  //            << std::endl;
 
   // TODO: re-triangulate surface
   // TODO: export

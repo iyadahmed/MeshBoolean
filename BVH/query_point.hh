@@ -7,6 +7,5 @@
 #include "bvh.hh"
 
 namespace BVH {
-size_t closest_triangle(const BVH &bvh, const Vec3 &point,
-                        float max_distance = 0.001f);
+bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index = 0);
 }
