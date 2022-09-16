@@ -33,7 +33,12 @@ public:
   void write_triangle(const Vec3 &a, const Vec3 &b, const Vec3 &c,
                       const Vec3 &custom_normal) {
     BinaryTriangle t{custom_normal, {a, b, c}, 0};
-    fwrite(&t, sizeof(BinaryTriangle), 1, file);
+    size_t n = fwrite(&t, sizeof(BinaryTriangle), 1, file);
+    if (n == 1) {
+      number_of_triangles++;
+    } else {
+      throw std::runtime_error("Error writing triangle");
+    }
   }
 };
 } // namespace meshio::stl
