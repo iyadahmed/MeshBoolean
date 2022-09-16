@@ -57,16 +57,19 @@ void BVH::update_tree() {
   Node &root_node = nodes_[root_node_index];
   root_node.first_primitive_index = 0;
   root_node.last_primitive_index = triangles.size() - 1;
-  update_node_bounds(root_node_index);
-  subdivide(root_node_index);
+  build_tree(root_node_index);
   assert(count_leaf_triangles(0) == triangles.size());
   assert(nodes_.size() <= (2 * triangles.size()));
 }
 
-void BVH::subdivide(size_t parent_node_index) {
+void BVH::build_tree(size_t parent_node_index) {
   Node &parent_node = nodes_[parent_node_index];
 
   assert(parent_node.first_primitive_index <= parent_node.last_primitive_index);
+  assert(parent_node.first_primitive_index < triangles.size());
+  assert(parent_node.last_primitive_index < triangles.size());
+
+  update_node_bounds(parent_node_index);
 
   if (parent_node.first_primitive_index == parent_node.last_primitive_index) {
     return;
@@ -85,43 +88,47 @@ void BVH::subdivide(size_t parent_node_index) {
       parent_node.bounding_box.min[split_axis] + extent[split_axis] / 2;
 
   // In-place partition
-  size_t partition_start = parent_node.first_primitive_index;
-  size_t partition_end = parent_node.last_primitive_index;
-  while (partition_start < partition_end) {
-    if (triangles[partition_start].cached_centroid[split_axis] < split_pos) {
-      partition_start++;
+  size_t i = parent_node.first_primitive_index;
+  size_t j = parent_node.last_primitive_index + 1;
+
+  while (i < j) {
+    if (triangles[i].cached_centroid[split_axis] < split_pos) {
+      i++;
     } else {
-      assert(partition_end != 0);
-      // TODO: store triangle indices instead so that swap is faster
-      std::swap(triangles[partition_start], triangles[partition_end]);
-      partition_end--;
+      assert(j != 0);
+      j--;
+      std::swap(triangles[i], triangles[j]);
     }
   }
 
-  if (partition_start == parent_node.first_primitive_index ||
-      partition_end == parent_node.last_primitive_index) {
+  if (i == parent_node.first_primitive_index ||
+      i == parent_node.last_primitive_index + 1) {
     return;
   }
 
   size_t left_first_primitive_index = parent_node.first_primitive_index;
-  size_t left_last_primitive_index = partition_end;
+  size_t left_last_primitive_index = i - 1;
+
+  assert(left_last_primitive_index <= parent_node.last_primitive_index &&
+         left_last_primitive_index >= parent_node.first_primitive_index);
 
   size_t right_first_primitive_index = left_last_primitive_index + 1;
   size_t right_last_primitive_index = parent_node.last_primitive_index;
+
+  assert(right_first_primitive_index <= parent_node.last_primitive_index &&
+         right_first_primitive_index >= parent_node.first_primitive_index);
 
   parent_node.left_child_index = get_new_node_index();
   Node &left_node = nodes_[parent_node.left_child_index];
   left_node.first_primitive_index = left_first_primitive_index;
   left_node.last_primitive_index = left_last_primitive_index;
-  update_node_bounds(parent_node.left_child_index);
 
   parent_node.right_child_index = get_new_node_index();
   Node &right_node = nodes_[parent_node.right_child_index];
   right_node.first_primitive_index = right_first_primitive_index;
   right_node.last_primitive_index = right_last_primitive_index;
-  update_node_bounds(parent_node.right_child_index);
 
-  subdivide(parent_node.left_child_index);
-  subdivide(parent_node.right_child_index);
+  build_tree(parent_node.left_child_index);
+  build_tree(parent_node.right_child_index);
 }
 } // namespace BVH

@@ -16,7 +16,7 @@ private:
   // TODO: Idea exponentially expanding array with max grow size
   std::vector<Node> nodes_;
 
-  void subdivide(size_t parent_node_index);
+  void build_tree(size_t parent_node_index);
   size_t get_new_node_index();
   void update_node_bounds(size_t node_index);
 
