@@ -23,9 +23,12 @@ public:
       throw std::runtime_error("Error opening file");
     }
     fwrite(header, sizeof(header), 1, file);
+    // Write number of triangles, so we can write over it later
+    fwrite(&number_of_triangles, sizeof(number_of_triangles), 1, file);
   }
 
   ~BinaryFileWriter() {
+    fseek(file, sizeof(header), SEEK_SET);
     fwrite(&number_of_triangles, sizeof(number_of_triangles), 1, file);
     fclose(file);
   }
