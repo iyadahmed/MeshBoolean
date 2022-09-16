@@ -30,7 +30,7 @@ add_executable(
         BVH/triangle.hh
 )
 
-target_compile_features(boolean PUBLIC cxx_std_11)
+target_compile_features(boolean PUBLIC cxx_std_17)
 #target_link_libraries(boolean PUBLIC TBB::tbb)
 set_target_properties(boolean PROPERTIES CXX_EXTENSIONS OFF)
 
