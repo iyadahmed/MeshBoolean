@@ -66,8 +66,9 @@ void BVH::update_tree() {
   nodes_.reserve(2 * triangles.size());
 
   for (auto &t : triangles) {
-    t.cached_centroid = t.calc_centroid();
     t.cached_bounding_box = t.calc_bounding_box();
+    t.cached_centroid =
+        (.5 * t.cached_bounding_box.max + .5 * t.cached_bounding_box.min);
   }
 
   size_t root_node_index = get_new_node_index();
