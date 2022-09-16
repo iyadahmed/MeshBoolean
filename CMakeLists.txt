@@ -9,7 +9,6 @@ add_executable(
         ball_tree2.hh
         boolean.cc
         common.hh
-        meshio.hh
         non_copyable.hh
         statistics.hh
         timers.hh
@@ -28,7 +27,7 @@ add_executable(
         BVH/segment_segment_intersection_2d.hh
         BVH/segment_triangle_intersection.hh
         BVH/triangle.hh
-)
+        meshio/stl_binary_triangle.hh meshio/stl_binary_reader.hh meshio/fread_e.hh meshio/stl_binary_writer.hh)
 
 target_compile_features(boolean PUBLIC cxx_std_17)
 #target_link_libraries(boolean PUBLIC TBB::tbb)
@@ -37,11 +36,11 @@ set_target_properties(boolean PROPERTIES CXX_EXTENSIONS OFF)
 add_executable(
         unique
 
-        meshio.hh
+        meshio/stl_binary_triangle.hh meshio/stl_binary_reader.hh meshio/fread_e.hh meshio/stl_binary_writer.hh
         unique_points.cc
         vec3.hh
 )
-target_compile_features(unique PUBLIC cxx_std_11)
+target_compile_features(unique PUBLIC cxx_std_17)
 #target_link_libraries(unique PUBLIC TBB::tbb)
 set_target_properties(unique PROPERTIES CXX_EXTENSIONS OFF)
 

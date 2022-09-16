@@ -3,7 +3,7 @@
 #include "BVH/bvh.hh"
 #include "BVH/query_point.hh"
 #include "BVH/segment_bvh_intersection.hh"
-#include "meshio.hh"
+#include "meshio/stl_binary_reader.hh"
 #include "timers.hh"
 
 #include <valgrind/callgrind.h>
@@ -35,7 +35,7 @@ int main(int argc, const char *argv[]) {
 
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
 
-//  std::vector<Intersection_Point> intersection_points;
+  //  std::vector<Intersection_Point> intersection_points;
 
   CALLGRIND_START_INSTRUMENTATION;
   CALLGRIND_TOGGLE_COLLECT;
