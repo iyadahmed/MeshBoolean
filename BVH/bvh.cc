@@ -28,6 +28,23 @@ size_t BVH::count_leaf_nodes(size_t node_index) const {
          count_leaf_nodes(node.right_child_index);
 }
 
+LeafInfo BVH::find_biggest_leaf(size_t node_index) const {
+  if (node_index == INVALID_INDEX) {
+    return LeafInfo{INVALID_INDEX, 0};
+  }
+  Node const &node = nodes_[node_index];
+  if (node.is_leaf()) {
+    return LeafInfo{node_index,
+                    node.last_primitive_index - node.first_primitive_index + 1};
+  }
+  LeafInfo l1 = find_biggest_leaf(node.right_child_index);
+  LeafInfo l2 = find_biggest_leaf(node.left_child_index);
+  if (l1.num_tris > l2.num_tris) {
+    return l1;
+  }
+  return l2;
+}
+
 size_t BVH::count_leaf_triangles(size_t node_index) const {
   if (node_index == INVALID_INDEX) {
     return 0;

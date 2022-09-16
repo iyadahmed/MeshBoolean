@@ -8,6 +8,11 @@
 #include "triangle.hh"
 
 namespace BVH {
+struct LeafInfo {
+  size_t index;
+  size_t num_tris;
+};
+
 class BVH {
   // Reference:
   // https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
@@ -27,5 +32,6 @@ public:
   void update_tree();
   size_t count_leaf_triangles(size_t node_index = 0) const;
   size_t count_leaf_nodes(size_t node_index = 0) const;
+  LeafInfo find_biggest_leaf(size_t node_index = 0) const;
 };
 } // namespace BVH

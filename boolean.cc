@@ -4,6 +4,7 @@
 #include "BVH/query_point.hh"
 #include "BVH/segment_bvh_intersection.hh"
 #include "meshio/stl_binary_reader.hh"
+#include "meshio/stl_binary_writer.hh"
 #include "timers.hh"
 
 #include <valgrind/callgrind.h>
@@ -34,6 +35,21 @@ int main(int argc, const char *argv[]) {
   timer.tock("Building BVH");
 
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
+
+  {
+    meshio::stl::BinaryFileWriter binary_stl("out.stl");
+
+    const BVH::Node &node = bvh.nodes[bvh.find_biggest_leaf().index];
+    if (not node.is_leaf()) {
+      throw;
+    }
+    for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
+         i++) {
+      const BVH::Triangle &triangle = bvh.triangles[i];
+      binary_stl.write_triangle(triangle.verts[0], triangle.verts[1],
+                                triangle.verts[2], {});
+    }
+  }
 
   //  std::vector<Intersection_Point> intersection_points;
 
