@@ -47,8 +47,8 @@ int main(int argc, const char *argv[]) {
     if (not node.is_leaf()) {
       throw;
     }
-    for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
-         i++) {
+    for (size_t i = node.first_primitive_index;
+         i < (node.first_primitive_index + node.number_of_primitives); i++) {
       const BVH::Triangle &triangle = bvh.triangles[i];
       binary_stl.write_triangle(triangle.verts[0], triangle.verts[1],
                                 triangle.verts[2], {});
@@ -82,9 +82,9 @@ int main(int argc, const char *argv[]) {
   CALLGRIND_TOGGLE_COLLECT;
   CALLGRIND_STOP_INSTRUMENTATION;
 
-  //  std::cout << "Number of intersection points = " <<
-  //  intersection_points.size()
-  //            << std::endl;
+  //    std::cout << "Number of intersection points = " <<
+  //    intersection_points.size()
+  //              << std::endl;
 
   // TODO: re-triangulate surface
   // TODO: export

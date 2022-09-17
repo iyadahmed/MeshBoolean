@@ -9,17 +9,14 @@
 namespace BVH {
 struct Node {
   AABB bounding_box;
-  size_t left_child_index, right_child_index;
-  size_t first_primitive_index, last_primitive_index;
 
-  Node() {
-    left_child_index = right_child_index = INVALID_INDEX;
-    first_primitive_index = last_primitive_index = INVALID_INDEX;
-  }
+  union {
+    uint32_t first_primitive_index = 0;
+    uint32_t left_child_index;
+  };
 
-  bool is_leaf() const {
-    return left_child_index == INVALID_INDEX &&
-           right_child_index == INVALID_INDEX;
-  }
-};
+  uint32_t number_of_primitives = 0;
+
+  bool is_leaf() const { return number_of_primitives > 0; }
+} __attribute__((aligned(32)));
 } // namespace BVH

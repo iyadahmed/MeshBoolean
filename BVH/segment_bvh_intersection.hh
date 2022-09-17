@@ -21,8 +21,8 @@ void intersect(const BVH::BVH &bvh, const BVH::Segment3D &segment,
     return;
   }
   if (node.is_leaf()) {
-    for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
-         i++) {
+    for (size_t i = node.first_primitive_index;
+         i < (node.first_primitive_index + node.number_of_primitives); i++) {
       const BVH::Triangle &t = bvh.triangles[i];
       auto intersection_result = intersect_segment_triangle(segment, t);
       for (size_t pi = 0; pi < intersection_result.num_points; pi++) {
@@ -37,7 +37,7 @@ void intersect(const BVH::BVH &bvh, const BVH::Segment3D &segment,
     }
   } else {
     intersect(bvh, segment, output, node.left_child_index);
-    intersect(bvh, segment, output, node.right_child_index);
+    intersect(bvh, segment, output, node.left_child_index + 1);
   }
 }
 
@@ -49,8 +49,8 @@ size_t number_of_intersected_triangles(const BVH::BVH &bvh,
     return 0;
   if (node.is_leaf()) {
     size_t n = 0;
-    for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
-         i++) {
+    for (size_t i = node.first_primitive_index;
+         i < (node.first_primitive_index + node.number_of_primitives); i++) {
       n += do_segment_intersect_triangle(segment, bvh.triangles[i]);
     }
     return n;
@@ -58,6 +58,6 @@ size_t number_of_intersected_triangles(const BVH::BVH &bvh,
     return number_of_intersected_triangles(bvh, segment,
                                            node.left_child_index) +
            number_of_intersected_triangles(bvh, segment,
-                                           node.right_child_index);
+                                           node.left_child_index + 1);
   }
 }

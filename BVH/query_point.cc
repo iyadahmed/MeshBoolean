@@ -15,8 +15,8 @@ bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index) {
   }
 
   if (node.is_leaf()) {
-    for (size_t i = node.first_primitive_index; i <= node.last_primitive_index;
-         i++) {
+    for (size_t i = node.first_primitive_index;
+         i < (node.first_primitive_index + node.number_of_primitives); i++) {
       const Triangle &tri = bvh.triangles[i];
       for (const auto &v : tri.verts) {
         if (distance(v, point) < .0001f) {
@@ -27,8 +27,8 @@ bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index) {
 
     return false;
   } else {
-    return contains_point(bvh, point, node.right_child_index) ||
-           contains_point(bvh, point, node.left_child_index);
+    return contains_point(bvh, point, node.left_child_index) ||
+           contains_point(bvh, point, node.left_child_index + 1);
   }
 }
 } // namespace BVH
