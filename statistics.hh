@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 class RunningMean {
 private:
   float old_mean_;

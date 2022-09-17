@@ -1,20 +1,10 @@
 #include <cassert>
 
+#include "../statistics.hh"
 #include "bvh.hh"
 #include "common.hh"
 
 namespace BVH {
-void BVH::update_node_bounds(uint32_t node_index) {
-  Node &node = nodes_[node_index];
-  node.bounding_box.min = std::numeric_limits<float>::infinity();
-  node.bounding_box.max = -1 * node.bounding_box.min;
-  for (size_t i = node.first_primitive_index;
-       i < (node.first_primitive_index + node.number_of_primitives); i++) {
-    const AABB &bb = triangles[i].cached_bounding_box;
-    node.bounding_box.min.min(bb.min);
-    node.bounding_box.max.max(bb.max);
-  }
-}
 
 uint32_t BVH::count_leaf_nodes(uint32_t node_index) const {
   Node const &node = nodes_[node_index];
@@ -78,23 +68,34 @@ void BVH::build_tree(uint32_t parent_node_index) {
   assert(parent_node.first_primitive_index + parent_node.number_of_primitives <=
          triangles.size());
 
-  update_node_bounds(parent_node_index);
+  // Calculate node bounds and variance
+  RunningStat<Vec3> running_stats;
+  parent_node.bounding_box.min = std::numeric_limits<float>::infinity();
+  parent_node.bounding_box.max = -1 * parent_node.bounding_box.min;
+  for (size_t i = parent_node.first_primitive_index;
+       i <
+       (parent_node.first_primitive_index + parent_node.number_of_primitives);
+       i++) {
+    const AABB &bb = triangles[i].cached_bounding_box;
+    parent_node.bounding_box.min.min(bb.min);
+    parent_node.bounding_box.max.max(bb.max);
+    running_stats.push(triangles[i].cached_centroid);
+  }
 
   if (parent_node.number_of_primitives < 2) {
     return;
   }
 
-  Vec3 extent = parent_node.bounding_box.max - parent_node.bounding_box.min;
-  size_t split_axis = 0;
-  if (extent[1] > extent[0]) {
+  Vec3 variance = running_stats.get_variance();
+  uint32_t split_axis = 0;
+  if (variance[1] > variance[0]) {
     split_axis = 1;
   }
-  if (extent[2] > extent[split_axis]) {
+  if (variance[2] > variance[split_axis]) {
     split_axis = 2;
   }
 
-  float split_pos =
-      parent_node.bounding_box.min[split_axis] + extent[split_axis] / 2;
+  float split_pos = running_stats.get_mean()[split_axis];
 
   // In-place partition
   uint32_t i = parent_node.first_primitive_index;

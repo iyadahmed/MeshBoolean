@@ -23,7 +23,6 @@ private:
 
   void build_tree(uint32_t parent_node_index);
   uint32_t get_new_node_index();
-  void update_node_bounds(uint32_t node_index);
 
 public:
   std::vector<Triangle> triangles;
