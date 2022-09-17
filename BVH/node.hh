@@ -3,11 +3,12 @@
 #include <cstddef>
 #include <limits>
 
+#include "../common.hh"
 #include "aabb.hh"
 #include "common.hh"
 
 namespace BVH {
-struct Node {
+ALIGNED_TYPE_(struct, 32) {
   AABB bounding_box;
 
   union {
@@ -18,5 +19,7 @@ struct Node {
   uint32_t number_of_primitives = 0;
 
   bool is_leaf() const { return number_of_primitives > 0; }
-} __attribute__((aligned(32)));
+}
+
+Node;
 } // namespace BVH
