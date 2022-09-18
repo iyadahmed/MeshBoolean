@@ -1,8 +1,14 @@
+#include <immintrin.h>
+
 #include "query_point.hh"
 
 static bool is_point_outside_aabb(const BVH::AABB &aabb, const Vec3 &point) {
-  return point.x > aabb.max.x or point.y > aabb.max.y or point.z > aabb.max.z or
-         point.x < aabb.min.x or point.y < aabb.min.y or point.z < aabb.min.z;
+  assert((point.x > aabb.max.x or point.y > aabb.max.y or
+          point.z > aabb.max.z or point.x < aabb.min.x or
+          point.y < aabb.min.y or point.z < aabb.min.z) ==
+         (aabb.min.any_gt(point) or point.any_gt(aabb.max)));
+
+  return aabb.min.any_gt(point) or point.any_gt(aabb.max);
 }
 
 namespace BVH {

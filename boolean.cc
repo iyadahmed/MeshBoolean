@@ -30,9 +30,13 @@ int main(int argc, const char *argv[]) {
   }
   std::cout << "Number of triangles = " << bvh.triangles.size() << std::endl;
 
+  CALLGRIND_START_INSTRUMENTATION;
+  CALLGRIND_TOGGLE_COLLECT;
   Timer timer;
   bvh.update_tree();
   timer.tock("Building BVH");
+  CALLGRIND_TOGGLE_COLLECT;
+  CALLGRIND_STOP_INSTRUMENTATION;
 
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
 
@@ -57,9 +61,6 @@ int main(int argc, const char *argv[]) {
 
   //  std::vector<Intersection_Point> intersection_points;
 
-  CALLGRIND_START_INSTRUMENTATION;
-  CALLGRIND_TOGGLE_COLLECT;
-
   timer.tick();
   for (const auto &t : bvh.triangles) {
     // FIXME: slow segment intersection
@@ -78,9 +79,6 @@ int main(int argc, const char *argv[]) {
     }
   }
   timer.tock();
-
-  CALLGRIND_TOGGLE_COLLECT;
-  CALLGRIND_STOP_INSTRUMENTATION;
 
   //    std::cout << "Number of intersection points = " <<
   //    intersection_points.size()

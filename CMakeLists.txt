@@ -14,6 +14,7 @@ add_executable(
         timers.hh
         vec3.hh
 
+        BVH/aabb.asm
         BVH/aabb.hh
         BVH/barycentric.hh
         BVH/bvh.cc
