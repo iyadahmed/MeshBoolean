@@ -36,9 +36,13 @@ struct Vec3 {
     out.z = std::max(a.z, b.z);
   }
 
-  static Vec3 max(const Vec3 &a, const Vec3 &b) { return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)}; }
+  static Vec3 max(const Vec3 &a, const Vec3 &b) {
+    return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
+  }
 
-  static Vec3 min(const Vec3 &a, const Vec3 &b) { return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)}; }
+  static Vec3 min(const Vec3 &a, const Vec3 &b) {
+    return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
+  }
 
   void min(const Vec3 &other) {
     x = std::min(x, other.x);
@@ -52,10 +56,13 @@ struct Vec3 {
     z = std::max(z, other.z);
   }
 
-  float dot(const Vec3 &other) const { return x * other.x + y * other.y + z * other.z; }
+  float dot(const Vec3 &other) const {
+    return x * other.x + y * other.y + z * other.z;
+  }
 
   Vec3 cross(const Vec3 &other) const {
-    return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
+    return {y * other.z - z * other.y, z * other.x - x * other.z,
+            x * other.y - y * other.x};
   }
 
   float length_squared() const { return x * x + y * y + z * z; }
@@ -73,16 +80,24 @@ struct Vec3 {
 
   float distance(const Vec3 &other) const { return (*this - other).length(); }
 
-  bool is_normalized(float epsilon = 0.000001f) const { return std::abs(length() - 1.0f) < epsilon; }
+  bool is_normalized(float epsilon = 0.000001f) const {
+    return std::abs(length() - 1.0f) < epsilon;
+  }
 
   Vec3 absolute() const { return {std::abs(x), std::abs(y), std::abs(z)}; }
 
   // Element-wise multiplication
-  Vec3 operator*(const Vec3 &other) const { return {x * other.x, y * other.y, z * other.z}; }
+  Vec3 operator*(const Vec3 &other) const {
+    return {x * other.x, y * other.y, z * other.z};
+  }
 
-  Vec3 operator+(const Vec3 &other) const { return {x + other.x, y + other.y, z + other.z}; }
+  Vec3 operator+(const Vec3 &other) const {
+    return {x + other.x, y + other.y, z + other.z};
+  }
 
-  Vec3 operator-(const Vec3 &other) const { return {x - other.x, y - other.y, z - other.z}; }
+  Vec3 operator-(const Vec3 &other) const {
+    return {x - other.x, y - other.y, z - other.z};
+  }
 
   Vec3 operator-() const { return {-x, -y, -z}; }
 
@@ -113,13 +128,21 @@ struct Vec3 {
 
   Vec3 operator/(float t) const { return {x / t, y / t, z / t}; }
 
-  bool operator==(const Vec3 &other) const { return (x == other.x) && (y == other.y) && (z == other.z); }
+  bool operator==(const Vec3 &other) const {
+    return (x == other.x) && (y == other.y) && (z == other.z);
+  }
 
-  bool operator!=(const Vec3 &other) const { return !(this->operator==(other)); }
+  bool operator!=(const Vec3 &other) const {
+    return !(this->operator==(other));
+  }
 
-  float &operator[](size_t index) { return reinterpret_cast<float *>(&x)[index]; }
+  float &operator[](size_t index) {
+    return reinterpret_cast<float *>(&x)[index];
+  }
 
-  const float &operator[](size_t index) const { return reinterpret_cast<const float *>(&x)[index]; }
+  const float &operator[](size_t index) const {
+    return reinterpret_cast<const float *>(&x)[index];
+  }
 };
 
 // Convenience functions

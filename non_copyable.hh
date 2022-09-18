@@ -10,7 +10,8 @@ public:
   NonCopyable(const NonCopyable &other) = delete;
   NonCopyable &operator=(const NonCopyable &other) = delete;
 
-  /* Explicitly enable default construction, move construction and move assignment. */
+  /* Explicitly enable default construction, move construction and move
+   * assignment. */
   NonCopyable() = default;
   NonCopyable(NonCopyable &&other) = default;
   NonCopyable &operator=(NonCopyable &&other) = default;
