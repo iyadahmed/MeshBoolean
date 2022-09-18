@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../vec3.hh"
+#include "../../vec3.hh"
 
 namespace meshio::stl {
 

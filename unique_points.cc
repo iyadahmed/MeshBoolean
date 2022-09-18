@@ -3,7 +3,7 @@
 #include <tuple>
 #include <vector>
 
-#include "meshio/stl_binary_reader.hh"
+#include "meshio/stl/stl_binary_reader.hh"
 #include "timers.hh"
 
 using namespace meshio::stl;

@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "../non_copyable.hh"
-#include "fread_e.hh"
+#include "../../non_copyable.hh"
+#include "../fread_e.hh"
 #include "stl_binary_triangle.hh"
 
 namespace meshio::stl {

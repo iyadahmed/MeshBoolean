@@ -4,9 +4,9 @@
 #include <cstdio>
 #include <stdexcept>
 
-#include "../non_copyable.hh"
-#include "../vec3.hh"
-#include "fread_e.hh"
+#include "../../non_copyable.hh"
+#include "../../vec3.hh"
+#include "../fread_e.hh"
 #include "stl_binary_triangle.hh"
 
 namespace meshio::stl {

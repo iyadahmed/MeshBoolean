@@ -13,6 +13,8 @@ public:
   Vec3 cached_centroid;
   AABB cached_bounding_box;
 
+  Triangle(const Vec3 &a, const Vec3 &b, const Vec3 &c) { verts = {a, b, c}; }
+
   Vec3 calc_centroid() const {
     return {
         (verts[0].x + verts[1].x + verts[2].x) / 3,
