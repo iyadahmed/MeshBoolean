@@ -1,16 +1,15 @@
 #include "query_point.hh"
 
-static bool contains_point(const BVH::AABB &aabb, const Vec3 &point) {
-  return (point.x >= aabb.min.x) && (point.y >= aabb.min.y) &&
-         (point.z >= aabb.min.z) && (point.x <= aabb.max.x) &&
-         (point.y <= aabb.max.y) && (point.z <= aabb.max.z);
+static bool is_point_outside_aabb(const BVH::AABB &aabb, const Vec3 &point) {
+  return point.x > aabb.max.x or point.y > aabb.max.y or point.z > aabb.max.z or
+         point.x < aabb.min.x or point.y < aabb.min.y or point.z < aabb.min.z;
 }
 
 namespace BVH {
 
 bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index) {
   const Node &node = bvh.nodes[node_index];
-  if (not contains_point(node.bounding_box, point)) {
+  if (is_point_outside_aabb(node.bounding_box, point)) {
     return false;
   }
 
@@ -19,7 +18,7 @@ bool contains_point(const BVH &bvh, const Vec3 &point, size_t node_index) {
          i < (node.first_primitive_index + node.number_of_primitives); i++) {
       const Triangle &tri = bvh.triangles[i];
       for (const auto &v : tri.verts) {
-        if (distance(v, point) < .0001f) {
+        if (distance_squared(v, point) < .0001f * .0001f) {
           return true;
         }
       }
