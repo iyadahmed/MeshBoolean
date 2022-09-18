@@ -128,3 +128,7 @@ inline Vec3 cross(const Vec3 &a, const Vec3 &b) { return a.cross(b); }
 inline float dot(const Vec3 &a, const Vec3 &b) { return a.dot(b); }
 
 inline float distance(const Vec3 &a, const Vec3 &b) { return a.distance(b); }
+
+inline float distance_squared(const Vec3 &a, const Vec3 &b) {
+  return (a - b).length_squared();
+};
