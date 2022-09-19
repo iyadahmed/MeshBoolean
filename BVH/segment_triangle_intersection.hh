@@ -72,8 +72,7 @@ static bool do_segment_intersect_triangle(const BVH::Segment3D &segment,
 }
 
 static Segment_Triangle_Intersection_Result
-intersect_segment_triangle(const BVH::Segment3D &segment,
-                           const BVH::Triangle &triangle) {
+intersect_segment_triangle(const BVH::Segment3D &segment, const BVH::Triangle &triangle) {
   Vec3 s1 = segment[0] - triangle.verts[0];
   Vec3 s2 = segment[1] - triangle.verts[0];
   Vec3 triangle_normal = triangle.calc_normal();

@@ -33,8 +33,7 @@ public:
     fclose(file);
   }
 
-  void write_triangle(const Vec3 &a, const Vec3 &b, const Vec3 &c,
-                      const Vec3 &custom_normal) {
+  void write_triangle(const Vec3 &a, const Vec3 &b, const Vec3 &c, const Vec3 &custom_normal) {
     BinaryTriangle t{custom_normal, {a, b, c}, 0};
     size_t n = fwrite(&t, sizeof(BinaryTriangle), 1, file);
     if (n == 1) {

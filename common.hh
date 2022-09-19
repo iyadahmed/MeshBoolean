@@ -10,8 +10,7 @@
 
 #include <type_traits>
 
-template <typename T, typename = typename std::enable_if<
-                          std::is_arithmetic<T>::value, T>::type>
+template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 bool is_in_range_inclusive(const T &value, T range_start, T range_end) {
   return value >= range_start and value <= range_end;
 }

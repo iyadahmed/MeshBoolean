@@ -11,8 +11,7 @@ uint32_t BVH::count_leaf_nodes(uint32_t node_index) const {
   if (node.is_leaf()) {
     return 1;
   }
-  return count_leaf_nodes(node.left_child_index) +
-         count_leaf_nodes(node.left_child_index + 1);
+  return count_leaf_nodes(node.left_child_index) + count_leaf_nodes(node.left_child_index + 1);
 }
 
 LeafInfo BVH::find_biggest_leaf(uint32_t node_index) const {
@@ -47,8 +46,7 @@ void BVH::update_tree() {
 
   for (auto &t : triangles) {
     t.cached_bounding_box = t.calc_bounding_box();
-    t.cached_centroid =
-        (.5 * t.cached_bounding_box.max + .5 * t.cached_bounding_box.min);
+    t.cached_centroid = (.5 * t.cached_bounding_box.max + .5 * t.cached_bounding_box.min);
   }
 
   uint32_t root_node_index = get_new_node_index();
@@ -65,17 +63,14 @@ void BVH::build_tree(uint32_t parent_node_index) {
 
   assert(parent_node.first_primitive_index >= 0);
   assert(parent_node.first_primitive_index < triangles.size());
-  assert(parent_node.first_primitive_index + parent_node.number_of_primitives <=
-         triangles.size());
+  assert(parent_node.first_primitive_index + parent_node.number_of_primitives <= triangles.size());
 
   // Calculate node bounds and variance
   RunningStat<Vec3> running_stats;
   parent_node.bounding_box.min = std::numeric_limits<float>::infinity();
   parent_node.bounding_box.max = -1 * parent_node.bounding_box.min;
   for (size_t i = parent_node.first_primitive_index;
-       i <
-       (parent_node.first_primitive_index + parent_node.number_of_primitives);
-       i++) {
+       i < (parent_node.first_primitive_index + parent_node.number_of_primitives); i++) {
     const AABB &bb = triangles[i].cached_bounding_box;
     parent_node.bounding_box.min.min(bb.min);
     parent_node.bounding_box.max.max(bb.max);
@@ -114,14 +109,12 @@ void BVH::build_tree(uint32_t parent_node_index) {
   uint32_t left_first_primitive_index = parent_node.first_primitive_index;
   uint32_t left_num_primitives = i - left_first_primitive_index;
 
-  if (left_num_primitives == 0 ||
-      left_num_primitives == parent_node.number_of_primitives) {
+  if (left_num_primitives == 0 || left_num_primitives == parent_node.number_of_primitives) {
     return;
   }
 
   uint32_t right_first_primitive_index = i;
-  uint32_t right_num_primitives =
-      parent_node.number_of_primitives - left_num_primitives;
+  uint32_t right_num_primitives = parent_node.number_of_primitives - left_num_primitives;
 
   parent_node.number_of_primitives = 0;
 

@@ -28,9 +28,7 @@ public:
 
   ~BinaryFileReader() { fclose(file); }
 
-  size_t get_reported_number_of_triangles() const {
-    return number_of_triangles;
-  }
+  size_t get_reported_number_of_triangles() const { return number_of_triangles; }
 
   BinaryTriangle read_next_triangle() {
     BinaryTriangle output;

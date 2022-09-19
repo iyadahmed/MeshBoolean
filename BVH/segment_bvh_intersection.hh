@@ -41,8 +41,7 @@ void intersect(const BVH::BVH &bvh, const BVH::Segment3D &segment,
   }
 }
 
-size_t number_of_intersected_triangles(const BVH::BVH &bvh,
-                                       const BVH::Segment3D &segment,
+size_t number_of_intersected_triangles(const BVH::BVH &bvh, const BVH::Segment3D &segment,
                                        size_t node_index = 0) {
   const BVH::Node &node = bvh.nodes[node_index];
   if (!do_segment_intersect_aabb(segment, node.bounding_box))
@@ -55,9 +54,7 @@ size_t number_of_intersected_triangles(const BVH::BVH &bvh,
     }
     return n;
   } else {
-    return number_of_intersected_triangles(bvh, segment,
-                                           node.left_child_index) +
-           number_of_intersected_triangles(bvh, segment,
-                                           node.left_child_index + 1);
+    return number_of_intersected_triangles(bvh, segment, node.left_child_index) +
+           number_of_intersected_triangles(bvh, segment, node.left_child_index + 1);
   }
 }

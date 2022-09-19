@@ -8,8 +8,8 @@ struct Segment_Segment_Intersection_2D_Result {
   Vec2 point;
 };
 
-Segment_Segment_Intersection_2D_Result
-segment_segment_intersection_2d(const Segment2D &a, const Segment2D &b) {
+Segment_Segment_Intersection_2D_Result segment_segment_intersection_2d(const Segment2D &a,
+                                                                       const Segment2D &b) {
   const float &x1 = a[0].x;
   const float &y1 = a[0].y;
   const float &x2 = a[1].x;

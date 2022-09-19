@@ -12,9 +12,7 @@ using SortableVertex = std::tuple<float, float, float, size_t>;
 
 size_t get_triangle_index(const SortableVertex &v) { return std::get<3>(v); }
 
-Vec3 as_vec3(const SortableVertex &v) {
-  return {std::get<0>(v), std::get<1>(v), std::get<2>(v)};
-}
+Vec3 as_vec3(const SortableVertex &v) { return {std::get<0>(v), std::get<1>(v), std::get<2>(v)}; }
 
 int main(int argc, const char *argv[]) {
 

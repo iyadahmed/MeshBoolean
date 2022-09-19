@@ -1,2 +1,2 @@
 SeparateDefinitionBlocks: Always # Works with clang-format >= 14
-#ColumnLimit: 120
+ColumnLimit: 99

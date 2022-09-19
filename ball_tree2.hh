@@ -28,8 +28,7 @@ private:
     }
 
     bool is_leaf() const {
-      return left_child_index == INVALID_INDEX &&
-             right_child_index == INVALID_INDEX;
+      return left_child_index == INVALID_INDEX && right_child_index == INVALID_INDEX;
     }
   };
 
@@ -71,8 +70,8 @@ public:
     print_leaf_nodes(nodes_[node_index].right_child_index);
   }
 
-  void construct_ball_tree(size_t parent_node_index, std::vector<Vec3> &points,
-                           size_t first_index, size_t last_index) {
+  void construct_ball_tree(size_t parent_node_index, std::vector<Vec3> &points, size_t first_index,
+                           size_t last_index) {
     // TODO: refactor to be non recursive
     tassert(first_index <= last_index);
 
@@ -151,10 +150,8 @@ public:
     left_node.center = first_cluster_centroid;
     right_node.center = second_cluster_centroid;
 
-    construct_ball_tree(left_node_index, points, left_first_index,
-                        left_last_index);
-    construct_ball_tree(right_node_index, points, right_first_index,
-                        right_last_index);
+    construct_ball_tree(left_node_index, points, left_first_index, left_last_index);
+    construct_ball_tree(right_node_index, points, right_first_index, right_last_index);
   }
 
   //  void knn_search(std::queue<Vec3> &output, Vec3 const &query, size_t k) {
@@ -162,8 +159,7 @@ public:
   //  }
 
   // FIXME: copy points inside the structure to avoid passing it like this
-  bool point_exists(Vec3 const &query, float radius,
-                    std::vector<Vec3> const &points) const {
+  bool point_exists(Vec3 const &query, float radius, std::vector<Vec3> const &points) const {
     return point_exists(query, nodes_[0], radius, points);
   }
 

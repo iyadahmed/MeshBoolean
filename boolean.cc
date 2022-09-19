@@ -37,8 +37,7 @@ int main(int argc, const char *argv[]) {
   std::cout << "Number of leaf nodes = " << bvh.count_leaf_nodes() << std::endl;
 
   BVH::LeafInfo biggest_leaf = bvh.find_biggest_leaf();
-  std::cout << "Largest leaf = " << biggest_leaf.num_tris << " triangles"
-            << std::endl;
+  std::cout << "Largest leaf = " << biggest_leaf.num_tris << " triangles" << std::endl;
 
   {
     meshio::stl::BinaryFileWriter binary_stl("out.stl");
@@ -50,8 +49,7 @@ int main(int argc, const char *argv[]) {
     for (size_t i = node.first_primitive_index;
          i < (node.first_primitive_index + node.number_of_primitives); i++) {
       const BVH::Triangle &triangle = bvh.triangles[i];
-      binary_stl.write_triangle(triangle.verts[0], triangle.verts[1],
-                                triangle.verts[2], {});
+      binary_stl.write_triangle(triangle.verts[0], triangle.verts[1], triangle.verts[2], {});
     }
   }
 
