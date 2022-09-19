@@ -14,7 +14,7 @@ int signof(float value, float epsilon) {
   if (value > epsilon) {
     return 1;
   }
-  if (value < epsilon) {
+  if (value < -epsilon) {
     return -1;
   }
   return 0;
