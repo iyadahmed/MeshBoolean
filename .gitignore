@@ -2,3 +2,4 @@ cmake-build-*
 callgrind.out.*
 profile.sh
 .idea
+/build/
